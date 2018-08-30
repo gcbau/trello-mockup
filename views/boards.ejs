@@ -45,7 +45,7 @@
                 <!-- personal boards ejs -->
                 <% for(let i=0; i<personalboards.length; ++i) { %>
                     <div id=<%= personalboards[i].id %> class="board-icon">
-                        <a href=<%= '../b/'+personalboards[i].id+'/'+personalboards[i].name %>><%= personalboards[i].name %></a>
+                        <a href=<%= '/b/'+personalboards[i].id+'/'+personalboards[i].name %>><%= personalboards[i].name %></a>
                     </div>
                 <% } %>
                 <!-- add new board -->
@@ -56,16 +56,17 @@
         <% for(let i=0; i<teams.length; ++i) { %>
             <% let team = teams[i] %>
             <% let boards = team.boards %>
-            <div id=<%= team.tid %> class="team">
+            <div id=<%= team.teamId %> class="team">
                 <div class="team-heading">
-                    <i class="fas fa-user"></i><%= team.tname %>
+                    <i class="fas fa-user"></i><%= team.teamName %>
                 </div>
                 <div class="team-content">
-                    <% for(let j=0; j<boards.length; ++j) { %>
-                        <% let board = boards[j].split(';') %>
-                        <div id=<%= board[0] %> class="board-icon">
-                            <a href=<%= '../b/'+board[0]+'/'+board[1] %>><%= board[1] %></a>
-                        </div>
+                    <% if (boards[0] != null) { %>
+                        <% for(let j=0; j<boards.length; ++j) { %>
+                            <div id=<%= boards[j].id %> class="board-icon">
+                                <a href=<%= '/b/'+boards[j].id+'/'+boards[j].name.replace(/ /g,'-') %>><%= boards[j].name %></a>
+                            </div>
+                        <% } %>
                     <% } %>
                     <button class="board-icon create-new-board-btn">Create New Board</button>
                 </div>

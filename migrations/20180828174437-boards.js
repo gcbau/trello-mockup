@@ -33,7 +33,8 @@ module.exports = {
         onDelete: 'cascade'
       },
       name: { type: Sequelize.STRING, allowNull: false },
-      lastViewed: { type: Sequelize.DATE, defaultValue: Sequelize.NOW }
+      lastViewed: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
+      createdOn: { type: Sequelize.DATE, defaultValue: Sequelize.NOW }
     });
   },
 

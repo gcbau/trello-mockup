@@ -24,9 +24,17 @@ module.exports = {
         },
         onDelete: 'cascade'
       },
+      ownerId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "users",
+          key: "id"
+        }
+      },
       name:        { type: Sequelize.STRING,  allowNull: false },
       description: { type: Sequelize.STRING,  allowNull: false },
-      order:       { type: Sequelize.INTEGER, allowNull: false }
+      order:       { type: Sequelize.INTEGER, allowNull: false },
+      createdOn: { type: Sequelize.DATE, defaultValue: Sequelize.NOW }
     });
   },
 

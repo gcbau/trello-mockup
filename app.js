@@ -37,6 +37,7 @@ app.use(session({
 
 app.use(function(req, res, next) {
   console.log('MIDDLEWARE => ', req.session);
+  // req.session.reset();
   if (req.session && req.session.user) {
     req.session.user = req.session.user;  //refresh the session value
     next();

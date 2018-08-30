@@ -15,7 +15,7 @@ var $content;
 function generateBoardIcon(teamId, boardId, title) 
 {
     return  '<div id="'+ boardId +'"class="board-icon">' + 
-                '<a href="../b/'+boardId+'/'+title+'">' + title + '</a>' +
+                '<a href="/b/'+boardId+'/'+title.replace(/ /g,'-')+'">' + title + '</a>' +
             '</div>';
 }
 
@@ -37,11 +37,6 @@ function setup()
 {   
     userId = localStorage.getItem('userId');
     username = localStorage.getItem('username');
-    teams = [{ 
-        tid: 0,
-        tname: 'personal',
-        boards: [] 
-    }];
     let url = `http://localhost:3000/all/${userId}`;
     console.log(url, userId);
 
@@ -50,9 +45,10 @@ function setup()
         method: 'GET'
     })
     .done( data => {
-        teams[0].boards = data.personal;
-        teams = teams.concat(data.teams);
-        console.log(teams);
+        console.log(data);
+        // teams[0].boards = data.personal;
+        // teams = teams.concat(data.teams);
+        // console.log(teams);
     })
     .fail( err => {
         console.error(err);
@@ -86,21 +82,15 @@ function createNewBoard(e)
     if (title === '') return;
     
     let $target = $('.board-creation-modal').data('target');
-    let teamIndex = $target.parent().parent().index()-1;
-    
-    console.log(teamIndex);
-
-    let teamId = teams[teamIndex]['tid'];
-
-    console.log(teamId);
-    
+    // let teamIndex = $target.parent().parent().index()-1;
+    // let teamId = teams[teamIndex]['tid'];
+    let teamId = $target.parent().parent().attr('id');
     let data = {
-        name: title
+        name:    title,
+        ownerId: userId
     };
 
-    if (teamId === 0) {
-        data['ownerId'] = userId;
-    } else {
+    if (teamId !== 'personal') {
         data['teamId'] = teamId;
     }
 
@@ -110,6 +100,7 @@ function createNewBoard(e)
         data: data
     })
     .done(function(data) {
+        console.log(data);
         displayBoard(teamId, data.id, data.name, $target);
     })
     .fail(function(err) {
@@ -119,7 +110,6 @@ function createNewBoard(e)
 
 function displayBoard(tid, bid, bname, $target) 
 {   /* display board in html */
-    console.log($target);
     let stringHTML = generateBoardIcon(tid, bid, bname);
     $(stringHTML).insertBefore($target);
     hideBoardModal();
@@ -155,15 +145,17 @@ function createNewTeam(e)
     if ('' === title) return;
 
     $.ajax({
-        url: 'http://localhost:3000/${username}/boards/createTeam',
+        url: 'http://localhost:3000/${username}/boards/team',
         method: 'POST',
         data: {
             name: title,
-            userId: userId
+            ownerId: userId,
+            description: description
         }
     })
     .done( data => {
         console.log(data);
+        hideTeamForm();
     })
     .fail( err => {
         console.err(err);
@@ -176,7 +168,7 @@ function createNewTeam(e)
 
 $(function() {
     // setup
-    setup();
+    setup(); 
     // loadTeams();
 
     $body = $('body');

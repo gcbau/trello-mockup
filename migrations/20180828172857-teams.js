@@ -23,7 +23,9 @@ module.exports = {
           key: "id"
         }
       },
-      name: { type: Sequelize.STRING, allowNull: false }
+      name: { type: Sequelize.STRING, allowNull: false },
+      description: { type: Sequelize.STRING },
+      createdOn: { type: Sequelize.DATE, defaultValue: Sequelize.NOW }
     });
   },
 

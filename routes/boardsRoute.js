@@ -8,64 +8,49 @@ var db = require('../models/index');
  */
 router.get('/', function(req, res) 
 {
+    console.log('RENDER INTIAL BOARDS => ', req.session.user);
     console.log(' ');
-    console.log(req.session.user);
     let user = req.session.user;
+    let uid  = user.id;
 
-    getAllPersonalBoards(res, user);
-});
+    let query = `
+        SELECT t.id "teamId", t.name "teamName", "tb"."boards"
+        FROM (SELECT t.id, json_agg(b.*) AS "boards"
+            FROM "teams" t
+            FULL OUTER JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
+                ON t."id" = "b"."teamId"
+            LEFT JOIN "teamUsers" tu
+                ON "tu"."teamId" = "t"."id"
+            WHERE "b"."ownerId" = :id OR "tu"."userId" = :id
+            GROUP BY t.id) tb
+        LEFT JOIN "teams" t
+            ON "t"."id" = "tb"."id"
+    `;
 
-function getAllPersonalBoards(res, user) 
-{
-    let personalQuery = `
-    SELECT b."id", b."name"
-    FROM "boards" AS b
-    INNER JOIN "users" AS u ON (u."id" = b."ownerId")
-    WHERE b."ownerId" = :ownerId;`;
-
-    db.sequelize.query(personalQuery, {
-        replacements: { 
-            ownerId: user.id 
-        }, 
-        type: db.sequelize.QueryTypes.SELECT 
-    })
-    .then( personalboards => {
-        getAllTeams(res, user, personalboards);
-    })
-    .error( (err) => {
-        console.error(err);
-    });
-}
-
-function getAllTeams(res, user, personalboards) 
-{
-    let teamQuery = `
-    SELECT tu."teamId" AS tid, t."name" AS tname, array_agg(concat(b."id",';',b."name")) as boards
-    FROM "users" AS u
-    JOIN "teamUsers" AS tu ON (u."id" = tu."userId")
-    JOIN "teams" AS t ON (tu."teamId" = t."id")
-    LEFT JOIN boards b on (t.id = b."teamId")
-    GROUP BY tu."teamId", t."name";`;
-
-    db.sequelize.query(teamQuery, {
+    // execute query
+    db.sequelize.query(query, {
         replacements: {
-
+            id: uid
         },
         type: db.sequelize.QueryTypes.SELECT
     })
-    .then( teamboards => {
-        console.log(teamboards);
-        renderPage(res, personalboards, teamboards)
+    .then( data => {
+        renderPage(res, data);
     })
-    .error(err => {
-        console.log(err);
+    .error( err => {
+        next(createError(err));
     });
-}
+});
 
-function renderPage(res, personalboards, teams)
+function renderPage(res, data)
 {
+    let personal = data[data.length-1];
+    let teams = data.slice(0, data.length-1);
+    console.log(' ');
+    console.log(data);
+    console.log(' ');
     res.render('boards', {
-        personalboards: personalboards,
+        personalboards: personal.boards,
         teams: teams
     });
 }
@@ -75,20 +60,37 @@ function renderPage(res, personalboards, teams)
  */
 router.post('/board', function(req, res) 
 {
-    let insertQuery = `INSERT INTO "boards" ("name","ownerId","lastViewed") VALUES (:name, :ownerId, NOW()) RETURNING *`;
-    if (!req.body.ownerId) {
-        insertQuery = `INSERT INTO "boards" ("name","teamId","lastViewed") VALUES (:name, :teamId, NOW()) RETURNING *`;
+    // setup
+    let insertQuery = `
+        INSERT INTO "boards" 
+            ("name", "ownerId", "lastViewed", "createdOn") 
+        VALUES 
+            (:name , :ownerId , NOW(), NOW()) 
+        RETURNING * ;
+    `;
+
+    if (req.body.teamId) {
+        insertQuery = `
+            INSERT INTO "boards" 
+                ("name", "ownerId", "teamId", "lastViewed", "createdOn") 
+            VALUES 
+                (:name, :ownerId, :teamId, NOW(), NOW()) 
+            RETURNING * ;
+        `;
     }
+
+    // execute raw query
     db.sequelize.query(insertQuery, { 
         replacements: req.body, 
         type: db.sequelize.QueryTypes.INSERT 
     })
-    .then(function(sqlResponse) {
-        let data = sqlResponse[0][0];
+    .then( sqlres => {
+        // return inserted data
+        let data = sqlres[0][0];
         res.status(200).json(data);
     })
-    .error(function(err) {
-        console.error(err);
+    .error( err => {
+        next(err);
     });
 });
 
@@ -97,14 +99,23 @@ router.post('/board', function(req, res)
  */
 router.post('/team', function(req, res) 
 {
-    console.log(req.body);
+    // get request args
+    let args = req.body;
+    console.log(' ');
+    console.log("ERIEHWORHQOHRIQWI => ",args);
+    console.log(' ');
+
     let insertQuery = `
-        INSERT INTO "teams" ("name") 
-        VALUES (:name) RETURNING *`;
+        INSERT INTO "teams" 
+            ("name", "ownerId", "description") 
+        VALUES 
+            (:name, :ownerId, :description) 
+        RETURNING * ;
+    `;
     
     // insert into teams first
     db.sequelize.query(insertQuery, {
-        replacements: req.body,
+        replacements: args,
         type: db.sequelize.QueryTypes.INSERT
     })
     .then( sqlResponse => {
@@ -119,7 +130,7 @@ router.post('/team', function(req, res)
         db.sequelize.query(insertQuery, {
             replacements: {
                 teamId: data.id,
-                userId: req.body.userId
+                userId: args.ownerId
             },
             type: db.sequelize.QueryTypes.INSERT
         })

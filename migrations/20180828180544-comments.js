@@ -32,7 +32,7 @@ module.exports = {
         },
         onDelete: 'cascade'
       },
-      timestamp: { type: Sequelize.DATE,   allowNull: false },
+      createdOn: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
       body:      { type: Sequelize.STRING, allowNull: false }
     });
   },
