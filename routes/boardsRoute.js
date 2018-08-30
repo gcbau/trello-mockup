@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 var db = require('../models/index');
 
+router.use(function(req, res, next) {
+    res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+    next();
+});
 
 /**
  *  Render initial page
@@ -44,6 +48,12 @@ router.get('/', function(req, res)
 
 function renderPage(res, data)
 {
+    if (0 === data.length) {
+        res.render('boards', {
+            personalboards: [],
+            teams: []
+        });
+    }
     let personal = data[data.length-1];
     let teams = data.slice(0, data.length-1);
     console.log(' ');

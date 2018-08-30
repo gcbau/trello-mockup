@@ -155,11 +155,18 @@ function createNewTeam(e)
     })
     .done( data => {
         console.log(data);
-        hideTeamForm();
+        displayTeam(data.id, data.name, $btn);
     })
     .fail( err => {
         console.err(err);
     });
+}
+
+function displayTeam(teamId, title, $target)
+{
+    let stringHTML = generateTeamRow(teamId, title);
+    $(stringHTML).insertBefore($target);
+    hideTeamForm();
 }
 
 //******************//

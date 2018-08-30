@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
-    <link rel="stylesheet" href="css/navbar.css"/>
-    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="/stylesheets/style.css"/>
+    <link rel="stylesheet" href="/stylesheets/navbar.css"/>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
     
     <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.7/lib/sortable.js"></script>
@@ -9,11 +9,27 @@
     <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.7/lib/droppable.js"></script>
 
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-    <script src="js/boards.js"></script>
+    <script src="/javascripts/lists.js"></script>
 </head>
 
 <body>
-    <a href="index.html">home</a>
+    <!-- Navigation Bar -->
+    <nav id="navbar">
+        <ul class="left">
+            <li id="boards-nav">
+                <i class="fas fa-clipboard-list"></i> Boards
+            </li>
+            <li id="search-nav">
+                <div id="show-search-input"></div>
+                <div class="search-icon"><i class="fas fa-search"></i></div>
+            </li>
+        </ul>
+        <ul class="right">
+            <li id="notifications-nav"><i class="fas fa-bell"></i></li>
+            <li id="profile-nav">HL</li>
+        </ul>
+    </nav>
+
     <div id="content">
         <button id="addColumnBtn">Add List Item</button>
     </div>
