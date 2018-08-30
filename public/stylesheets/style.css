@@ -1,0 +1,343 @@
+* {
+    box-sizing: content-box;
+    outline : none;
+}
+html, body {
+    position: relative;
+    min-width: 100%;
+    width: max-content;
+    min-height: 100%;
+    height: 100%;
+
+    margin: 0;
+    font-size: 0;
+}
+
+.active {
+    display: block!important;
+}
+
+a {
+    font-size: 16px;
+}
+
+#content {
+    padding: 20px 10px;
+}
+
+div.col {
+    font-size: 16px;
+    border: 1px solid black;
+    background: #e2e4e6;
+    border-radius: 5px;
+    margin: 0 5px;
+    padding: 0;
+
+    display: inline-block;
+    vertical-align: top;
+}
+
+h2 {
+    padding: 20px;
+    margin: 0;
+    cursor: pointer;
+}
+
+div.col ul {
+    list-style-type: none;
+    padding: 0 10px;
+    margin: 0;
+    width: 256px;
+}
+
+li.row {
+    position: relative;
+    border-radius: 5px;
+    background: white;
+    width: 236px;
+    padding: 8px 10px;
+    margin: 0;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+    cursor: pointer;
+}
+
+.newCardInput {
+    padding: 8px 10px!important;
+    font-size: 16px;
+    width: 236px;
+    height: 42px;
+    border-radius: 5px;
+    padding: 0;
+    border: 0;
+    resize: none;
+}
+.textarea-active {
+    padding: 0;
+    height: 58px;
+    width: 256px;
+}
+li.row:hover {
+    background: rgba(0,0,0,.2);
+}
+.li-options-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    padding: 4px;
+}
+.li-options-btn:hover {
+    background: rgba(0,0,0,.4);
+}
+
+
+
+
+
+/** draggable */
+.draggable-source--is-dragging {
+    color: rgba(0,0,0,0)!important;
+    background: rgba(0,0,0,.3)!important;
+}
+.draggable-source--is-dragging ul li{
+    color: rgba(0,0,0,0)!important;
+    background: rgba(0,0,0,.3)!important;
+    cursor: default;
+}
+.draggable-source--is-dragging div{
+    cursor: default;
+}
+.draggable-source--is-dragging div:hover{
+    cursor: default;
+    background: rgba(0,0,0,.3);
+    color: rgba(0,0,0,0);
+}
+
+.col-foot {
+    padding: 10px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.col-foot:hover {
+    cursor: pointer;
+    background: grey;
+}
+
+
+
+
+
+
+
+#addColumnBtn {
+    display:inline-block;
+    width: 216px;
+    background: white;
+    border: 1px solid black;
+    padding: 20px 40px;
+    cursor: pointer;
+}
+
+#newColumnForm {
+    border: 1px solid black;
+    display: inline-block;
+    width: 276px;
+    height: 78px;
+}
+#listTitleInput {
+    font-size: 20px;
+    border: 0;
+    border-bottom: 1px solid grey;
+    padding: 0 10px;
+    width: 256px;
+    height: 34px;
+}
+#newColSubmit {
+    display: inline-block;
+    vertical-align: top;
+    padding: 0;
+    height: 32px;
+    width: 90px;
+    margin: 5px;
+    cursor: pointer;
+}
+#closeColumnFormBtn {
+    display: inline-block;
+    vertical-align: top;
+    padding: 0;
+    height: 32px;
+    width: 32px;
+    margin: 5px;
+    margin-left: 0;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+/** card info modal */
+.card-info-modal {
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    display: none;
+}
+
+.card-info-modal * {
+    box-sizing: border-box;
+}
+
+.modal-info-container .main {
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: top;
+    margin: 0;
+    width: 570px;
+    height: 610px;
+    background: white;
+
+    list-style-type: none;
+    padding: 20px;
+    font-size: 16px;
+}
+
+.modal-info-container {
+    position: fixed;
+    top: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: fit-content;
+    background: white;
+}
+
+/** Title */
+#title-content h3 {
+    margin: 0;
+}
+
+/** Labels */
+#labels-content {
+    margin-top: 30px;
+}
+
+.labels-container {
+    position: relative;
+    width: 100%;
+    border: 1px solid black;
+    cursor: text;
+    font-size: 0;
+    padding: 5px;
+}
+
+.label {
+    display: inline-block;
+    vertical-align: top;
+    margin: 5px;
+    border: 1px solid black;
+    border-radius: 5px;
+    background: white;
+
+    font-size: 16px;
+    padding: 10px;
+    cursor: default;
+}
+
+.del-label-btn {
+    cursor: pointer;
+    border: 1px solid rgba(0,0,0,.1);
+    padding: 1px 5px;
+}
+
+#label-input  {
+    box-sizing: border-box;
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,.1);
+    margin: 5px;
+
+    max-width: 100%;
+    width: auto;
+    height: 40px;
+    max-height: 40px;
+
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 10px;
+    font-size: 16px;
+}
+#label-input  br {
+    display:none;
+}
+
+/** Description */
+#description-content {
+    margin-top: 30px;
+    width: 100%;
+}
+#description {
+    width: 100%;
+    border: 1px solid black;
+
+    cursor: pointer;
+}
+
+
+.modal-info-container .side {
+    display: inline-block;
+    vertical-align: top;
+    width: 200px;
+    height: 610px;
+    background: black;
+}
+
+/** New Comment */
+#comment-content {
+    margin-top: 30px;
+    width: 100%;
+}
+
+#comment-content #comment {
+    width: 100%;
+    height: 80px;
+    resize: vertical;
+}
+
+/** Activity */
+#activity-content {
+    margin-top: 25px;
+}
+
+/*
+ *  card options modal 
+ */
+.card-options-modal {
+    position: absolute;
+    top:0;
+    left: 0;
+    height: 100%;
+}
+.modal-background {
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.4);
+}
+.card-input {
+    position: absolute;
+    width: 236px;
+    height: 200px;
+    padding: 8px 10px;
+    resize: none;
+}
+.modal-save {
+    position: absolute;
+}
+
+.modal-active {
+    overflow: hidden;
+}

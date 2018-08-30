@@ -1,0 +1,169 @@
+#navbar {
+    position: fixed;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 40px;
+    background: #40a65c;
+}
+
+.left,
+.right {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.left {
+    float: left;
+    padding-left: 4px;
+}
+
+.right {
+    float: right;
+    padding-right: 4px;
+}
+
+.right li,
+.left li {
+    display: inline-block;
+    vertical-align: top;
+    padding: 7px;
+    margin: 4px 0 4px 0px;
+    border-radius: 3px;
+    font-size: 16px;
+    background: #7fc291;
+    color: white;
+
+    min-width: 32px;
+    min-height: 32px;
+    text-align: center;
+}
+
+.left i,
+.right i {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#profile-nav {
+    border-radius: 100%;
+    background: #d6dadc;
+    color: #444444;
+}
+
+#boards-nav {
+    width: 90px;
+}
+#boards-nav i {
+    margin-left: 3px;
+    margin-right: 8px;
+}
+
+
+/**
+*   search-nav
+*/
+#search-nav {
+    position: relative;
+    width: 180px;
+    padding: 0;
+    text-align: left;
+}
+#search-nav #show-search-input {
+    margin: 0;
+    padding: 0;
+    height: 18px;
+    cursor: text;
+}
+#search-nav .close-search-btn,
+#search-nav .search-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: scaleX(-1);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    padding-top: 7px;
+}
+#search-nav #search-input {
+    margin: 7px;
+    font-size: 16px;
+    padding: 0;
+    width: 300px;
+    border: 0;
+}
+.search-extended {
+    width: 375px!important;
+    background: white!important;
+    color: black!important;
+}
+
+/**
+*   boards-sidebar
+*/
+.boards-sidebar {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    width: 283px;
+    height: 100%;
+
+    padding: 44px 4px 4px 0px;
+    display: none;
+}
+.boards-sidebar #sidebar-content {
+    width: 100%;
+    height: 100%;
+    background: white;
+    border: 1px solid black;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
+/**
+*   profile-sidebar
+*/
+.profile-sidebar {
+    position: fixed;
+    top: 0;
+    right: 4px;
+    width: 310px;
+    height: 364px;
+
+    padding-top: 44px;
+    display: none;
+}
+.profile-sidebar #profile-content {
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 5px;
+}
+
+
+/**
+*   notifications-sidebar
+*/
+.notifications-sidebar {
+    position: fixed;
+    top: 0;
+    right: 4px;
+    width: 420px;
+    height: 542px;
+
+    padding-top: 44px;
+    display: none;
+}
+.notifications-sidebar #notifications-content {
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 5px;
+}

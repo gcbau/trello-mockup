@@ -1,0 +1,243 @@
+* {
+    box-sizing: border-box;
+    outline: none;
+}
+
+html, body {
+    position: relative;
+    min-height: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.active {
+    display: block!important;
+}
+
+/** Board Content */
+#board-content {
+    width: 100%;
+    min-height: 100%;
+    background: #f8f9f9;
+
+    padding: 1% 25% 0 25%;
+}
+
+.team {
+    width: 750px;
+    margin-top: 50px;
+    /* background: #fff; */
+
+    display: block;
+}
+
+.team-heading {
+    width: 100%;
+    height: 30px;
+    border-bottom: 1px solid black;
+
+    padding-top: 7px;
+    padding-left: 10px;
+    padding-bottom: 30px;
+}
+.team-heading span {
+    margin-left: 30px;
+    font-weight: bolder;
+}
+
+.team-content {
+    width: 100%;
+    min-height: 100px;
+
+    font-size: 0;
+}
+
+.board-icon {
+    width: 170px;
+    height: 100px;
+    background: #e2e4e6;
+    border: 0;
+    border-radius: 6px;
+
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: top;
+    font-size: 16px;
+}
+
+.board-icon a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding-top: 10px;
+    padding-left: 10px;
+}
+
+.board-icon:hover {
+    background: #d6d8da;
+}
+.board-icon:nth-child(n+2) {
+    margin-left: 22.5px;
+}
+.board-icon:nth-child(4n+1) {
+    margin-left: 0;
+}
+.board-icon:nth-child(n+5) {
+    margin-top: 25px;
+}
+
+/** Board Creation Modal */
+.board-creation-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 100%;
+    display: none;
+}
+
+.modal-background {
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.2);
+}
+
+.modal-content {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 400px;
+    height: 150px;
+    background: white;
+    border: 1px solid black;
+}
+
+.input-container {
+    position: relative;
+    width: 295px;
+    height: 100px;
+    border: 1px solid black;
+
+    padding: 5px;
+}
+.input-container #board-title {
+    width: 230px;
+    font-size: 20px;
+}
+.input-container #modal-close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+
+    width: 20px;
+    height: 20px;
+    border: 1px solid black;
+    cursor: pointer;
+    text-align: center;
+}
+
+.board-background-options {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    font-size: 0;
+}
+.board-background-options .options-icon {
+    width: 30px;
+    height: 30px;
+    border: 1px solid black;
+    display: inline-block;
+}
+.board-background-options .options-icon:nth-child(n+4) {
+    margin-top: 5px;
+}
+.board-background-options .options-icon:nth-child(n+2) {
+    margin-left: 5px;
+}
+.board-background-options .options-icon:nth-child(3n+1) {
+    margin-left: 0;
+}
+
+#create-board-btn {
+    margin-top: 5px;
+    width: 120px;
+    height: 35px;
+    border-radius: 5px;
+}
+
+/** Team Creation Form */
+#create-new-team-btn {
+    margin: 0;
+    margin-top: 50px;
+}
+
+.team-creation-container {
+    position: absolute;
+    width: 300px;
+    background: white;
+
+    padding: 10px;
+    text-align: center;
+
+    display: none;
+}
+
+.team-creation-container #form-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    width: 32px;
+    height: 32px;
+
+    cursor: pointer;
+    padding-top: 2px;
+}
+
+.team-creation-container h2 {
+    margin: 0;
+    border-bottom: 1px solid grey;
+
+    padding: 2px 0 12px 0;
+    font-size: 16px;
+    font-weight: normal;
+}
+
+#new-team-form {
+    text-align: left;
+}
+
+#new-team-form p {
+    margin-bottom: 0;
+}
+
+#team-title-input,
+#team-description-input {
+    width: 100%;
+    display: block;
+    font-size: 14px;
+}
+
+#team-title-input {
+    height: 34px;
+    padding: 0 5px;
+}
+
+#team-description-input {
+    height: 70px;
+    padding: 5px;
+    resize: vertical;
+}
+
+#create-team-btn {
+    box-sizing: content-box;
+    margin-top: 20px;
+    width: 92px;
+    height: 34px;
+}
