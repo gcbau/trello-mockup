@@ -9,14 +9,34 @@ $(function() {
     $signupForm.submit(signUpEvent);
 });
 
-/** login */
-function loginEvent(e) {
+function showError(msg) {
+    let $error = $('.error-msg');
+    $error.html(msg);
+    $error.addClass('active');
+}
+// function showSuccess(msg) {
+//     $('.error-msg').removeClass('active');
+
+//     let $success = $('.success-msg');
+//     $success.html(msg);
+//     $success.addClass('active');
+// }
+
+function loginEvent(e) 
+{   /** login */
     e.preventDefault();
 
     let email = $loginForm.children('#login-email').val().trim();
     let pw    = $loginForm.children('#login-password').val().trim();
-    if (email === undefined || email === '') return;
-    if (pw    === undefined || pw    === '') return;
+
+    if (email === undefined || email === '') { 
+        showError('No email provided'); 
+        return; 
+    }
+    if (pw    === undefined || pw    === '') {
+        showError('No password provided'); 
+        return;
+    }
 
     $.ajax({
         url: 'http://localhost:3000/home/login',
@@ -27,28 +47,37 @@ function loginEvent(e) {
         }
     })
     .done(function(res) {
-        let username = `${res.firstName.toLowerCase()}${res.lastName.toLowerCase()}`;
-        localStorage.setItem('userId', res.id);
-        localStorage.setItem('username', username);
-        window.location.href = `../${username}/boards`;
+        redirect(res);
     })
     .fail(function(err) {
         console.log(err);
     })
 }
 
-/** sign up */
-function signUpEvent(e) {
+function signUpEvent(e) 
+{   /** sign up */
     e.preventDefault();
 
     let first = $signupForm.children('#regist-firstname').val().trim();
     let last  = $signupForm.children('#regist-lastname').val().trim();
     let email = $signupForm.children('#regist-email').val().trim();
     let pw    = $signupForm.children('#regist-password').val().trim();
-    if (first === undefined || first === '') return;
-    if (last  === undefined || last  === '') return;
-    if (email === undefined || email === '') return;
-    if (pw    === undefined || pw    === '') return;
+    if (first === undefined || first === '') {
+        showError('No first name provided'); 
+        return;
+    }
+    if (last  === undefined || last  === '') {
+        showError('No last name provided'); 
+        return;
+    }
+    if (email === undefined || email === '') {
+        showError('No email provided'); 
+        return;
+    }
+    if (pw    === undefined || pw    === '') {
+        showError('No password provided'); 
+        return;
+    }
     
     $.ajax({
         url: 'http://localhost:3000/home/signup',
@@ -61,10 +90,11 @@ function signUpEvent(e) {
         }
     })
     .done(function(res) {
-        console.log(res);
+        redirect(res);
     })
     .fail(function(err) {
-        console.log(err);
+        let msg = err.responseJSON.error;
+        showError(msg);
     });
 } 
 
@@ -75,4 +105,17 @@ function checkloginInputs() {
 
 function checkSignUpInputs() {
     return;
+}
+
+
+
+
+
+
+
+function redirect(res) {
+    let username = `${res.firstName.toLowerCase()}${res.lastName.toLowerCase()}`;
+    localStorage.setItem('userId', res.id);
+    localStorage.setItem('username', username);
+    window.location.href = `/${username}/boards`;
 }

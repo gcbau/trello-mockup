@@ -8,7 +8,7 @@ var cors = require('cors');
 var session = require('client-sessions');
 
 var checkRouter = require('./routes/check');
-var loginRouter = require('./routes/login');
+var loginRouter = require('./routes/loginRoute');
 var indexRouter = require('./routes/index');
 var allRouter   = require('./routes/all');
 
@@ -27,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use(cors());
+
 app.use(session({
   cookieName: 'session',
   secret: 'random_string_goes_here',
@@ -56,6 +57,7 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
+  console.log('hello');
   // render the error page
   res.status(err.status || 500).json({
     error: err.message

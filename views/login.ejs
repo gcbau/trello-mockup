@@ -10,30 +10,37 @@
 
 <body>
     <section id="login">
-        <h1>Login</h1>
+        <div class="form-heading">
+            <h1>Login</h1>
+        </div>
         <form id="login-form">
-            <label for="email">Email</label>
-            <input type="text" name="email" id="login-email"/>
-            <label for="password">Password</label>
-            <input type="text" name="password" id="login-password"/>
-            <input type="submit"/>
+            <label for="email">Email:</label>
+            <input type="text" name="email" id="login-email" autocomplete="off" required/>
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="login-password" autocomplete="off" required/>
+            <input type="submit" value="Login"/>
         </form>
     </section>
 
     <section id="registration">
-        <h1>Registration</h1>
+        <div class="form-heading">
+            <h1>Signup</h1>
+        </div>
         <form id="registration-form">
-            <label for="firstname">First Name</label>
-            <input type="text" name="firstname" id="regist-firstname"/>
-            <label for="lastname">Last Name</label>
-            <input type="text" name="lastname" id="regist-lastname"/>
-            <label for="email">Email</label>
-            <input type="text" name="email" id="regist-email"/>
-            <label for="password">Password</label>
-            <input type="text" name="pw" id="regist-password"/>
-            <input type="submit"/>
+            <label for="firstname">First Name:</label>
+            <input type="text" name="firstname" id="regist-firstname" autocomplete="off" required/>
+            <label for="lastname">Last Name:</label>
+            <input type="text" name="lastname" id="regist-lastname" autocomplete="off" required/>
+            <label for="email">Email:</label>
+            <input type="text" name="email" id="regist-email" autocomplete="off" required/>
+            <label for="password">Password:</label>
+            <input type="password" name="pw" id="regist-password" autocomplete="off" required/>
+            <input type="submit" value="Signup"/>
         </form>
     </section>
+
+    <div class="error-msg"></div>
+    <div class="success-msg"></div>
 </body>
 
 

@@ -75,13 +75,18 @@ router.post('/signup', function(req, res, next) {
   
   db.sequelize.query(checkQuery, { type: db.sequelize.QueryTypes.SELECT }).then(sqlResponse => {
     if (0 < sqlResponse.length) {
-      next(createError(422));
+      next(createError(422, 'Email is already taken.'));
       return;
     }
 
-    let insertQuery = `INSERT INTO users values (DEFAULT, '${email}', '${pw}', '${first}', '${last}')`;
-    db.sequelize.query(insertQuery, { type: db.sequelize.QueryTypes.INSERT }).then(sqlResponse => {
-      res.send(status['200']);
+    let insertQuery = `INSERT INTO users values (DEFAULT, '${email}', '${pw}', '${first}', '${last}') RETURNING *`;
+    db.sequelize.query(insertQuery, { 
+      type: db.sequelize.QueryTypes.INSERT 
+    })
+    .then(sqlResponse => {
+      let data = sqlResponse[0][0];
+      delete data.password;
+      res.status(200).json(data);
     });
   });
 })
