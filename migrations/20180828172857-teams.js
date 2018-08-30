@@ -16,6 +16,13 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
+      ownerId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "users",
+          key: "id"
+        }
+      },
       name: { type: Sequelize.STRING, allowNull: false }
     });
   },

@@ -1,423 +1,193 @@
-/*************************************************************
-    All functionalities that involves around boards.html
- *************************************************************/
+/*******************************************************************
+    All functionalities that involves around index.html
+ *******************************************************************/
 
+var userId;
+var username;
+var teams;
+var $body;
 var $content;
-var $addColumnBtn;
-var $cardTitleToReplace;
 
-var liSortable;
-var ulSortable;
+//******************//
+//  HELPER METHODS  
+//******************//
 
-var queries;
-var boardId;
-var cache;
-
-var labels = [];
-
-const MAX_LABEL_INPUT = 16;
-
-/** HELPER: get query string */
-function getQueryString() {
-    let queriesArray = window.location.search.replace('?','').split('&');
-    let queries = {};
-    for (let i=0; i<queriesArray.length; ++i) {
-        let kv = queriesArray[i].split('=');
-        queries[kv[0]] = kv[1];
-    }
-    return queries;
+function generateBoardIcon(teamId, boardId, title) 
+{
+    return  '<div id="'+ boardId +'"class="board-icon">' + 
+                '<a href="../b/'+boardId+'/'+title+'">' + title + '</a>' +
+            '</div>';
 }
 
-/** begin setup */
-function setupSortables() {
-    if (liSortable && ulSortable) {
-        liSortable.destroy();
-        ulSortable.destroy();
-    }
+function generateTeamRow(teamId, title) 
+{
+    return  '<div id="'+teamId+'" class="team">'+
+                '<div class="team-heading"><i class="fas fa-users"></i><span>'+title+'</span></div>'+
+                '<div class="team-content">'+
+                    '<button class="board-icon create-new-board-btn">Create New Board</button>'+
+                '</div>'+
+            '</div>';
+}
 
-    liSortable = new Sortable.default(document.querySelectorAll('.card-container'), {
-        draggable: '.row'
-      });
-    ulSortable = new Sortable.default(document.querySelector('div'), {
-        draggable: 'div.col'
+//******************//
+//  SETUP METHODS
+//******************//
+
+function setup() 
+{   
+    userId = localStorage.getItem('userId');
+    username = localStorage.getItem('username');
+    teams = [{ 
+        tid: 0,
+        tname: 'personal',
+        boards: [] 
+    }];
+    let url = `http://localhost:3000/all/${userId}`;
+    console.log(url, userId);
+
+    $.ajax({
+        url: url,
+        method: 'GET'
+    })
+    .done( data => {
+        teams[0].boards = data.personal;
+        teams = teams.concat(data.teams);
+        console.log(teams);
+    })
+    .fail( err => {
+        console.error(err);
     });
-
-    liSortable.on('sortable:start', (event) => {
-        console.log('hello')
-    });
-    liSortable.on('sortable:stop', (event) => {
-        console.log(event);
-    });
-    ulSortable.on('sortable:start', (event) => {
-        let $target = $(event.data.dragEvent.data.sensorEvent.target);
-        if (!$target.hasClass('colHeading')) {
-            event.cancel();
-        }
-    });
 }
 
-function setupSelectors() {
-    $content = $('#content');
-    $addColumnBtn = $('#addColumnBtn');
+//******************//
+//  BOARD METHODS 
+//******************//
+
+function showBoardModal(e) 
+{   /* Show board creation modal */
+    let $modal = $('.board-creation-modal');
+    $modal.addClass('active');
+    $modal.data('target', $(e.target));
 }
 
-function setupCache() {
-    queries = getQueryString();
-    cache = JSON.parse(localStorage.getItem('prello'));
-    let teamId = queries.t;
-    let boardId = queries.b;
-    let lsts = cache["teams"][teamId]['boards'][boardId]['lists'];
-    console.log(lsts);
-
-    loadLists(lsts);
+function hideBoardModal() 
+{   /* Hide board creation modal */
+    let $modal = $('.board-creation-modal');
+    $modal.removeClass('active');
+    $modal.removeData('target');
 }
 
-function loadLists(lsts) {
-    let lstsIds = Object.keys(lsts);
-    for (let i=0; i<lstsIds.length; ++i) {
-        let lstId = lstsIds[i];
-        let title = lsts[lstId]['name'];
-        newListItem(lstId, title).insertBefore($('#addColumnBtn'));
-        loadCards(lstId, lsts[lstId]['cards']);
-    }
-}
-
-function loadCards(lstId, cards) {
-    let cardIds = Object.keys(cards);
-    for (let j=0; j<cardIds.length; ++j) {
-        let cardId = cardIds[j];
-        let cardName = cards[cardId]['name'];
-        let card = $(`<li id="${cardId}" class="row">${cardName}</li>`);
-        $(`#${lstId} ul`).append(card);
-    }
-}
-
-/** new list */
-function newListItemForm() {
-    let form = $('<form id="newColumnForm"></form');
-    form.append('<input type="text" id="listTitleInput"/>');
-    form.append('<button id="newColSubmit" value="Submit Here">Add List</button>');
-    form.append('<button id="closeColumnFormBtn">X</button>')
-    return form;
-}
-
-function newListItem(listId, title) {
-    let column = $('<div id="'+ listId +'" class="col"></div>');
-    column.append('<h2 class="colHeading">'+title+'</h2>');
-    column.append('<ul class="card-container"></ul>');
-    column.append('<div class="col-foot addRowItem">+ Add a card</div>');
-
-    return column;
-}
-
-function cacheNewList(listId, title) {
-    let teamId = queries.t;
-    let boardId = queries.b;
-    let lsts = cache["teams"][teamId]['boards'][boardId]['lists'];
-    lsts[listId] = {
-        cards: {},
-        name: title
-    }
+function createNewBoard(e) 
+{   /* Create new board */
+    let $btn = $(e.target);
+    let $textInput = $btn.siblings().find('#board-title');
+    let title = $textInput.val().trim();
     
-    let stringified = JSON.stringify(cache);
-    localStorage.setItem('prello', stringified);
-}
+    if (title === '') return;
+    
+    let $target = $('.board-creation-modal').data('target');
+    let teamIndex = $target.parent().parent().index()-1;
+    
+    console.log(teamIndex);
 
+    let teamId = teams[teamIndex]['tid'];
 
-/** new card */
-function newListRow() {
-    let row = $('<li class="row textarea-active"></li>');
-    row.append('<textarea class="newCardInput"></textarea>');
-    return row;
-}
-
-function cacheNewCard(title, lstId) {
-    let teamId = queries.t;
-    let boardId = queries.b;
-    let list = cache["teams"][teamId]['boards'][boardId]['lists'][lstId];
-    let nextId = cache['nextId']++;
-    list['cards'][nextId*13] = {
+    console.log(teamId);
+    
+    let data = {
         name: title
+    };
+
+    if (teamId === 0) {
+        data['ownerId'] = userId;
+    } else {
+        data['teamId'] = teamId;
     }
-    let stringified = JSON.stringify(cache);
-    localStorage.setItem('prello',stringified);
+
+    $.ajax({
+        url: `http://localhost:3000/${username}/boards/board`,
+        method: 'POST',
+        data: data
+    })
+    .done(function(data) {
+        displayBoard(teamId, data.id, data.name, $target);
+    })
+    .fail(function(err) {
+        console.error(err);
+    });
 }
 
-function cardOptionsModal() {
-    let modal = $('<div class="card-options-modal"></div>');
-    modal
-        .append('<div class="modal-background"></div>')
-        .append('<textarea class="card-input"></textArea>')
-        .append('<button class="modal-save">Save</button>');
-    return modal;
+function displayBoard(tid, bid, bname, $target) 
+{   /* display board in html */
+    console.log($target);
+    let stringHTML = generateBoardIcon(tid, bid, bname);
+    $(stringHTML).insertBefore($target);
+    hideBoardModal();
 }
 
+//******************//
+//  TEAM METHODS 
+//******************//
 
+function showTeamForm(e) 
+{   /** show new team form */
+    let offset  = $(e.target).offset();
+    let $form = $('.team-creation-container');
+    console.log($form);
+    $form.addClass('active');
+    $form.css('top', offset.top+'px');
+    $form.css('left', offset.left+'px');
+}
 
+function hideTeamForm() 
+{   /** hide new team form */
+    let $form = $('.team-creation-container');
+    $form.removeClass('active');
+}
 
+function createNewTeam(e)
+{   /* create new team */
+    e.preventDefault();
+    let $btn = $(e.target);
+    let title = $btn.siblings('#team-title-input').val().trim();
+    let description = $btn.siblings('#team-description-input').val().trim();
 
+    if ('' === title) return;
 
+    $.ajax({
+        url: 'http://localhost:3000/${username}/boards/createTeam',
+        method: 'POST',
+        data: {
+            name: title,
+            userId: userId
+        }
+    })
+    .done( data => {
+        console.log(data);
+    })
+    .fail( err => {
+        console.err(err);
+    });
+}
 
+//******************//
+//  MAIN FUNCTION 
+//******************//
 
-
-
-
-
-
-
-
-
-/** 
- *  Main: on window ready 
- */
 $(function() {
     // setup
-    setupSortables();
-    setupSelectors();
-    setupCache();
+    setup();
+    // loadTeams();
 
+    $body = $('body');
+    $content = $('#board-content');
 
+    // event handlers
+    $body.on('click', '.create-new-board-btn', showBoardModal);
+    $body.on('click', '.modal-background', hideBoardModal);
+    $body.on('click', '#create-board-btn', createNewBoard);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     *  Column Creation
-     */
-    $content.on('click', '#addColumnBtn',function(e) {
-        // display new col form
-        $('#addColumnBtn').replaceWith(newListItemForm());
-        $('#listTitleInput').focus();
-    });
-    $content.on('click', '#closeColumnFormBtn', function(e) {
-        // cancel new col creation
-        e.preventDefault();
-        $('#newColumnForm').replaceWith('<button id="addColumnBtn">Add List Item</button>');
-    });
-    $content.on('submit', '#newColumnForm', function(e) {
-        // create new col
-        e.preventDefault();
-        let title = $('#listTitleInput').val().trim();
-        if (title === '') {
-            return;
-        }
-        $('#listTitleInput').val('');
-        let listId = cache['nextId']++;
-        newListItem(listId*13, title).insertBefore($('#newColumnForm'));
-        cacheNewList(listId*13, title);
-        $('#newColumnForm')[0].scrollIntoView();
-    })
-
-    /**
-     *  Card Creation
-     */
-    $content.on('click', '.addRowItem', function(e) {
-        // display textarea and form
-        let target = $(e.target);
-        let ulList = $(target).prev();
-        ulList.append(newListRow());
-        target
-            .removeClass('addRowItem')
-            .empty()
-            .append('<button class="addNewCard-btn">Add Card</button>')
-            .append('<button class="closeNewCard-btn">X</button>');
-        $('.newCardInput').focus();
-    });
-
-    $content.on('click', '.addNewCard-btn', function(e) {
-        // click to submit new card
-        e.preventDefault();
-        let target = $(e.target).parent().prev().children().last().children();
-        let title = target.val().trim();
-        if (title === '') {
-            return;
-        } else {
-            let lstId = target.closest('.col').attr('id');
-            cacheNewCard(title, lstId);
-        }
-        let parent = target.parent();
-        target.remove();
-        parent.append(title);
-        parent.removeClass('textarea-active');
-        parent.removeAttr('style');
-    
-        $(e.target).parent()
-            .addClass('addRowItem')
-            .empty()
-            .append('+ Add a card')
-    
-        setupSortables();
-    });
-
-    $content.on('click', '.closeNewCard-btn', function(e) {
-        // cancel new card
-        e.preventDefault();
-        let target = $(e.target).parent();
-        target.prev().children().last().remove();
-        target
-            .addClass('addRowItem')
-            .empty()
-            .append('+ Add a card')
-    }); 
-
-    $content.on('input', '.newCardInput', function () {
-        // textarea auto resize
-        $(this).outerHeight(38).outerHeight(this.scrollHeight+20); // 38 or '1em' -min-height
-        $(this).parent().outerHeight(this.scrollHeight);
-    }); 
-
-    $content.on('keydown', '.newCardInput', function(e) {
-        // text area key presses
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            $('.addNewCard-btn').click();
-        }
-        else if (e.key === 'Escape') {
-            let target = $(e.target).parent();
-            let footer = target.parent().next();
-            target.remove();
-            footer
-                .addClass('addRowItem')
-                .empty()
-                .append('+ Add a card');
-        }
-    });
-
-    /**
-     *  Card info modal
-     */
-    $content.on('click', 'ul .row', function(e) {
-        if (e.target !== e.currentTarget) return;
-        $('.card-info-modal').addClass('active');
-    });
-
-    $('body').on('click', '.modal-background', function(e) {
-        $('.card-info-modal').removeClass('active');
-    });
-    
-    /**
-     *  Card Editable
-     */
-    $content.on('mouseenter', 'ul .row', function(e) {
-        // display options button
-        if (e.target !== e.currentTarget) return;
-        let $li = $(e.target);
-        $li.append('<span class="li-options-btn"><i class="fas fa-pen"></i></span>');
-    });
-    $content.on('mouseleave', 'ul .row', function(e) {
-        // hide options button
-        if (e.target !== e.currentTarget) return;
-        let $optionsBtn = $(e.target).find('.li-options-btn');
-        $optionsBtn.remove();
-    });
-
-    /**
-     *  Card Options Modal
-     */
-    $content.on('click', '.li-options-btn', function(e) {
-        $cardTitleToReplace = $(e.target).closest('li');
-        let pos = $cardTitleToReplace.offset();
-        $content.append(cardOptionsModal());
-        $('.card-options-modal')
-            .css('width', $('body').width() + 'px');
-        $('.card-input')
-            .css('top', pos.top+'px')
-            .css('left', pos.left+'px')
-            .focus();
-        $('.modal-save')
-            .css('top', (pos.top+220)+'px')
-            .css('left', pos.left+'px');
-        $('body').addClass('modal-active');
-    })
-
-    $content.on('click', '.modal-background', function(e) {
-        console.log('hiding modal');
-        $(e.target).parent().remove();
-        $('body').removeClass('modal-active');
-    })
-
-    $content.on('keydown', '.card-input', function(e) {
-        if (e.key === 'Enter') {
-            let newTitle = $(e.target).val();
-            $cardTitleToReplace.html(newTitle);
-            $cardTitleToReplace = null;
-            $(e.target).parent().remove();
-            $('body').removeClass('modal-active');
-        }
-    })
-    $content.on('click', '.modal-save', function(e) {
-        let newTitle = $(e.target).prev().val();
-        $cardTitleToReplace.html(newTitle);
-        $cardTitleToReplace = null;
-        $(e.target).parent().remove();
-        $('body').removeClass('modal-active');
-    })
-
-
-    /** label auto complete */
-    $('.labels-container').on('click', function(e) {
-        if (e.target !== e.currentTarget) {
-            return;
-        }
-        $('#label-input').focus();
-    })
-
-    $('#label-input').on('keydown', function(e) {
-        let $target = $(e.target);
-        let val = $target.html().trim();
-        // check for enter
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            console.log(val);
-            if (val === '') {
-                return;
-            }
-
-            // record and display new label
-            labels.push(val);
-            let $labelBlock =  $(`<div class="label">${val} <span class="del-label-btn">X</span></div>`);
-            $labelBlock.insertBefore($target);
-            $target.empty();
-            return;
-        } 
-        else if (e.key === 'Backspace') {
-            if (val === '') {
-                if ($target.prev().length) {
-                    $target.prev().remove();
-                }
-            }
-        }
-        else {
-            console.log(val.length);
-            if (MAX_LABEL_INPUT <= val.length) {
-                e.preventDefault();
-            }
-        }
-    });
-
-    $('.labels-container').on('click', '.del-label-btn', function (e) {
-        let $label = $(e.target).closest('.label');
-        $label.remove();
-    });
-})
+    $body.on('click', '#create-new-team-btn', showTeamForm);
+    $body.on('click', '#form-close-btn', hideTeamForm);
+    $body.on('click', '#create-team-btn', createNewTeam);
+});

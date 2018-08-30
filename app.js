@@ -9,7 +9,7 @@ var session = require('client-sessions');
 
 var checkRouter = require('./routes/check');
 var loginRouter = require('./routes/loginRoute');
-var indexRouter = require('./routes/index');
+var indexRouter = require('./routes/boardsRoute');
 var allRouter   = require('./routes/all');
 
 // create app

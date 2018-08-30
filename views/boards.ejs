@@ -1,54 +1,127 @@
 <!DOCTYPE html>
+<html>
+    
 <head>
-    <link rel="stylesheet" href="css/navbar.css"/>
-    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="/stylesheets/navbar.css"/>
+    <link rel="stylesheet" href="/stylesheets/index.css"/>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
     
-    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.7/lib/sortable.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.7/lib/draggable.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@shopify/draggable@1.0.0-beta.7/lib/droppable.js"></script>
-
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-    <script src="js/boards.js"></script>
+    <script src="/javascripts/boards.js"></script>
+    <script src="/javascripts/navbar.js"></script>
 </head>
 
 <body>
-    <a href="index.html">home</a>
-    <div id="content">
-        <button id="addColumnBtn">Add List Item</button>
+    <!-- Navigation Bar -->
+    <nav id="navbar">
+        <ul class="left">
+            <li id="boards-nav">
+                <i class="fas fa-clipboard-list"></i> Boards
+            </li>
+            <li id="search-nav">
+                <div id="show-search-input"></div>
+                <div class="search-icon"><i class="fas fa-search"></i></div>
+            </li>
+        </ul>
+        <ul class="right">
+            <li id="notifications-nav"><i class="fas fa-bell"></i></li>
+            <li id="profile-nav">HL</li>
+        </ul>
+    </nav>
+
+    <a href="boards.html">Jello</a>
+    <div id="board-content">
+        <div id="recently-viewed" class="team">
+            <div class="team-heading">
+                <i class="far fa-clock"></i>Recently Viewed
+            </div>
+            <div class="team-content"></div>
+        </div>
+        <div id="personal" class="team">
+            <div class="team-heading">
+                <i class="fas fa-user"></i>Personal Boards
+            </div>
+            <div class="team-content">
+                <!-- personal boards ejs -->
+                <% for(let i=0; i<personalboards.length; ++i) { %>
+                    <div id=<%= personalboards[i].id %> class="board-icon">
+                        <a href=<%= '../b/'+personalboards[i].id+'/'+personalboards[i].name %>><%= personalboards[i].name %></a>
+                    </div>
+                <% } %>
+                <!-- add new board -->
+                <button class="board-icon create-new-board-btn">Create New Board</button>
+            </div>
+        </div>
+        <!-- all other teams ejs -->
+        <% for(let i=0; i<teams.length; ++i) { %>
+            <% let team = teams[i] %>
+            <% let boards = team.boards %>
+            <div id=<%= team.tid %> class="team">
+                <div class="team-heading">
+                    <i class="fas fa-user"></i><%= team.tname %>
+                </div>
+                <div class="team-content">
+                    <% for(let j=0; j<boards.length; ++j) { %>
+                        <% let board = boards[j].split(';') %>
+                        <div id=<%= board[0] %> class="board-icon">
+                            <a href=<%= '../b/'+board[0]+'/'+board[1] %>><%= board[1] %></a>
+                        </div>
+                    <% } %>
+                    <button class="board-icon create-new-board-btn">Create New Board</button>
+                </div>
+            </div>
+        <% } %>
+        <button id="create-new-team-btn">Create a new team...</button>
     </div>
 
-    <div class="card-info-modal">
+    <div class="board-creation-modal">
         <div class="modal-background"></div>
-        <div class="modal-info-container">
-            <div id="close-modal-info-btn">X</div>
-            <ul class="main">
-                <li id="title-content">
-                    <h3>Title</h3>
-                    <span>in list bla</span>
-                </li>
-                <li id="labels-content">
-                    <span>Labels</span>
-                    <div class="labels-container">
-                        <div class="label">hello <span class="del-label-btn">X</span></div>
-                        <div contenteditable="true" id="label-input"></div>
-                    </div>
-                </li>
-                <li id="description-content">
-                    <span>Description</span>
-                    <div id="description">hello</div>
-                </li>
-                <li id="comment-content">
-                    <span>Add Comment</span>
-                    <textarea id="comment"></textarea>
-                </li>
-                <li id="activity-content">
-                    <span>Activity</span>
-                    <div id="activity-container">
-                    </div>
-                </li>
-            </ul>
-            <div class="side"></div>
+        <div class="modal-content">
+            <div class="input-container">
+                <input type="text" id="board-title" placeholder="Add Board Title"/>
+                <div id="modal-close-btn">X</div>
+            </div>
+            <div class="board-background-options">
+                <div class="options-icon"></div>
+                <div class="options-icon"></div>
+                <div class="options-icon"></div>
+                <div class="options-icon"></div>
+                <div class="options-icon"></div>
+                <div class="options-icon"></div>
+                <div class="options-icon"></div>
+                <div class="options-icon"></div>
+                <div class="options-icon"></div>
+            </div>
+            <button id="create-board-btn">Create Board</button>
         </div>
     </div>
+
+    <div class="team-creation-container">
+        <div id="form-close-btn">X</div>
+        <h2>Create Team</h2>
+        <form id="new-team-form">
+            <p>Name</p>
+            <input type="text" id="team-title-input"/>
+            <p>Description (optional)</p>
+            <textarea id="team-description-input"></textarea>
+            <button id="create-team-btn">Create</button>
+        </form>
+    </div>
+
+    <!-- board sidebar for navigation -->
+    <div class="boards-sidebar">
+        <div id="sidebar-content"></div>
+    </div>
+
+    <!-- profile sidebar for navigation -->
+    <div class="profile-sidebar">
+        <div id="profile-content"></div>
+    </div>
+
+    <!-- notifications sidebar for navigation -->
+    <div class="notifications-sidebar">
+            <div id="notifications-content"></div>
+    </div>
 </body>
+
+</html>
