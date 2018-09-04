@@ -31,7 +31,14 @@
     </nav>
 
     <div id="content">
-        <button id="addColumnBtn">Add List Item</button>
+        <div id="list-form-container" class="table-cell-active">
+                <button id="addColumnBtn" class="active">Add List Item</button>
+                <form id="newColumnForm">
+                    <input type="text" id="listTitleInput" value=""/>
+                    <button id="newColSubmit" value="Submit Here">Add List</button>
+                    <button id="closeColumnFormBtn">X</button>
+                </form>
+        </div>
     </div>
 
     <div class="card-info-modal">

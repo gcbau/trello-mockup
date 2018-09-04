@@ -1,5 +1,5 @@
 * {
-    box-sizing: content-box;
+    box-sizing: border-box;
     outline : none;
 }
 html, body {
@@ -17,24 +17,35 @@ html, body {
     display: block!important;
 }
 
+.table-cell-active {
+    display: table-cell!important;
+    vertical-align: top!important;
+}
+
 a {
     font-size: 16px;
 }
 
 #content {
-    padding: 20px 10px;
+    padding: 60px 10px 20px 10px;
+    display: table;
+    border-spacing: 10px;
 }
 
-div.col {
+.list {
     font-size: 16px;
-    border: 1px solid black;
-    background: #e2e4e6;
     border-radius: 5px;
     margin: 0 5px;
     padding: 0;
+    
+    display: table-cell;
+}
 
-    display: inline-block;
-    vertical-align: top;
+.list-wrapper {
+    position: relative;
+    border: 1px solid black;
+    background: #e2e4e6;
+    padding-bottom: 38px;
 }
 
 h2 {
@@ -43,23 +54,23 @@ h2 {
     cursor: pointer;
 }
 
-div.col ul {
+.list ul {
     list-style-type: none;
-    padding: 0 10px;
+    padding: 0;
     margin: 0;
     width: 256px;
 }
 
-li.row {
+.card {
     position: relative;
     border-radius: 5px;
     background: white;
     width: 236px;
-    padding: 8px 10px;
-    margin: 0;
+    margin: 0 10px;
     margin-bottom: 10px;
     word-wrap: break-word;
     cursor: pointer;
+    padding: 10px
 }
 
 .newCardInput {
@@ -73,11 +84,10 @@ li.row {
     resize: none;
 }
 .textarea-active {
-    padding: 0;
+    padding: 0!important;
     height: 58px;
-    width: 256px;
 }
-li.row:hover {
+.card:hover {
     background: rgba(0,0,0,.2);
 }
 .li-options-btn {
@@ -94,8 +104,27 @@ li.row:hover {
 
 
 
+.list-foot {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.list-foot:hover {
+    cursor: pointer;
+    background: grey;
+}
+
+#showCardForm,
+#cardForm {
+    display: none;
+    padding: 10px;
+}
+
+
 /** draggable */
-.draggable-source--is-dragging {
+/* .draggable-source--is-dragging {
     color: rgba(0,0,0,0)!important;
     background: rgba(0,0,0,.3)!important;
 }
@@ -111,17 +140,7 @@ li.row:hover {
     cursor: default;
     background: rgba(0,0,0,.3);
     color: rgba(0,0,0,0);
-}
-
-.col-foot {
-    padding: 10px;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-}
-.col-foot:hover {
-    cursor: pointer;
-    background: grey;
-}
+} */
 
 
 
@@ -130,26 +149,30 @@ li.row:hover {
 
 
 #addColumnBtn {
-    display:inline-block;
+    display: table-cell;
     width: 216px;
     background: white;
     border: 1px solid black;
     padding: 20px 40px;
     cursor: pointer;
+
+    display: none;
 }
 
 #newColumnForm {
     border: 1px solid black;
-    display: inline-block;
+    vertical-align: top;
     width: 276px;
     height: 78px;
+
+    display: none;
 }
 #listTitleInput {
     font-size: 20px;
     border: 0;
     border-bottom: 1px solid grey;
     padding: 0 10px;
-    width: 256px;
+    width: 100%;
     height: 34px;
 }
 #newColSubmit {

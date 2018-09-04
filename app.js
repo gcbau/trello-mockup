@@ -8,10 +8,12 @@ var cors = require('cors');
 var session = require('client-sessions');
 
 var checkRouter = require('./routes/check');
-var loginRouter = require('./routes/loginRoute');
-var indexRouter = require('./routes/boardsRoute');
 var allRouter   = require('./routes/all');
+
+var loginRouter = require('./routes/loginRoute');
+var boardsRouter = require('./routes/boardsRoute');
 var listsRouter = require('./routes/listsRoute');
+var cardsRouter = require('./routes/cardsRoute');
 
 // create app
 var app = express();
@@ -48,10 +50,13 @@ app.use(function(req, res, next) {
 });
 
 app.use('/home', loginRouter);
+
 app.use('*', checkRouter);
 app.use('/', allRouter);
+
+app.use('/:username/boards', boardsRouter);
 app.use('/', listsRouter);
-app.use('/:username/boards', indexRouter);
+app.use('/', cardsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

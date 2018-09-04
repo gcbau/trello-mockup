@@ -14,7 +14,7 @@ module.exports = {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
-        autoIncremenet: true
+        autoIncrement: true
       },
       listId: {
         type: Sequelize.INTEGER,
