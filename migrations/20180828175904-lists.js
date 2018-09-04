@@ -32,7 +32,7 @@ module.exports = {
         }
       },
       name:  { type: Sequelize.STRING,  allowNull: false },
-      order: { type: Sequelize.INTEGER, allowNull: false },
+      order: { type: Sequelize.INTEGER, allowNull: false, unique: true },
       createdOn: { type: Sequelize.DATE, defaultValue: Sequelize.NOW }
     });
   },
