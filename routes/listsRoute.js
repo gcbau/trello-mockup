@@ -87,10 +87,13 @@ router.patch('/list/position', function(req,res,next) {
 
     db.sequelize.query(queries, {
         type: db.sequelize.QueryTypes.UPDATE
-
     })
     .then( hello => {
         res.end();
+    })
+    .catch( (err) => {
+        console.log(err);
+        next(err)
     });
 
 });
