@@ -14,13 +14,6 @@ function showError(msg) {
     $error.html(msg);
     $error.addClass('active');
 }
-// function showSuccess(msg) {
-//     $('.error-msg').removeClass('active');
-
-//     let $success = $('.success-msg');
-//     $success.html(msg);
-//     $success.addClass('active');
-// }
 
 function loginEvent(e) 
 {   /** login */
@@ -87,15 +80,17 @@ function signUpEvent(e)
             last: last,
             email: email,
             pw: pw
+        },
+        success: (res) => {
+            console.log(res);
+            redirect(res);
+        },
+        error: (err) => {
+            console.log(err);
+            let msg = err.responseJSON.error.message;
+            showError(msg);
         }
     })
-    .done(function(res) {
-        redirect(res);
-    })
-    .fail(function(err) {
-        let msg = err.responseJSON.error;
-        showError(msg);
-    });
 } 
 
 /** error checking */
@@ -106,8 +101,6 @@ function checkloginInputs() {
 function checkSignUpInputs() {
     return;
 }
-
-
 
 
 

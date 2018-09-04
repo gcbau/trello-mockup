@@ -51,43 +51,47 @@ router.post('/signup', function(req, res, next) {
   let email = req.body.email;
   let pw    = req.body.pw;
 
+  console.log(first === undefined);
   if (first === undefined || first === '') {
-    next(createError(401));
+    next(createError(401, "first name field is missing"));
     return;
   }
   if (last  === undefined || last  === '') {
-    next(createError(401));
+    next(createError(401, "last name field is missing"));
     return;
   }
   if (email === undefined || email === '') {
-    next(createError(401));
+    next(createError(401, "email field is missing"));
     return;
   }
   if (pw    === undefined || pw    === '') {
-    next(createError(401));
+    next(createError(401, "password field is missing"));
     return;
   }
-
-  let checkQuery = `
-    SELECT * 
-    FROM users 
-    WHERE email = '${email}'`;
   
-  db.sequelize.query(checkQuery, { type: db.sequelize.QueryTypes.SELECT }).then(sqlResponse => {
-    if (0 < sqlResponse.length) {
-      next(createError(422, 'Email is already taken.'));
-      return;
+  let insertQuery = `INSERT INTO users values (DEFAULT, '${email}', '${pw}', '${first}', '${last}') RETURNING *`;
+  db.sequelize.query(insertQuery, { 
+      type: db.sequelize.QueryTypes.INSERT 
+  })
+  .then( (sqlResponse) => {
+    let data = sqlResponse[0][0];
+    delete data.password;
+    req.session.user = data;
+    res.status(200).json(data);
+  })
+  .catch( (err) => {
+
+    let error = err;
+    switch(err.name) {
+      case 'SequelizeUniqueConstraintError': {
+        error = err.errors[0].message
+        break;
+      }
+      default:
+        break; 
     }
 
-    let insertQuery = `INSERT INTO users values (DEFAULT, '${email}', '${pw}', '${first}', '${last}') RETURNING *`;
-    db.sequelize.query(insertQuery, { 
-      type: db.sequelize.QueryTypes.INSERT 
-    })
-    .then(sqlResponse => {
-      let data = sqlResponse[0][0];
-      delete data.password;
-      res.status(200).json(data);
-    });
+    next(createError(400, error));
   });
 })
 
