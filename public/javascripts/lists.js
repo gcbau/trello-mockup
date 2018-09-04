@@ -96,6 +96,7 @@ function updateCardPositions(cid, lid, oldListId)
         })
     } 
 
+    console.log(data);
     $.ajax({
         url: 'http://localhost:3000/card/position',
         method: 'patch',
@@ -173,6 +174,7 @@ function setupCards()
             // cards don't exist
             if (!tempCards[0]) continue;
             // cards exist
+            console.log(lists[i]);
             for (let j=0; j<tempCards.length; ++j) {
                 let card = tempCards[j];
                 let $card = $(generateCardHTML(card["id"],card["name"]));
@@ -327,11 +329,12 @@ function createCard(e)
 
     let listId = $card.closest('.list').attr('id');
 
-    saveCard(cardname, listId);
+    saveCard($card, cardname, listId);
     displayCard($card, $btn, cardname);
 }
 
-function saveCard(cardname, listId) {
+function saveCard($card, cardname, listId) {
+    let $parent = $card.parent();
     $.ajax({
         url: 'http://localhost:3000/card',
         method: 'post',
@@ -344,8 +347,7 @@ function saveCard(cardname, listId) {
         }
     })
     .then( (data) => {
-        cards[listId].push(data);
-        console.log(cards);
+        $parent.attr('id', data.id);
     })
     .fail( (err) => {
         console.error(err);
@@ -359,7 +361,7 @@ function displayCard($card, $btn, cardname)
     $parent.removeClass('textarea-active');
     $parent.removeAttr('style');
 
-    let $foot = $btn.closest('li');
+    let $foot = $btn.closest('.list-foot');
     $foot.find('#showCardForm').addClass('active');
     $foot.find('#cardForm').removeClass('active');
 }

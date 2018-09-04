@@ -15,14 +15,14 @@ router.get('/card/:uid/:bid', function(req,res)
         LEFT JOIN (SELECT c.* FROM cards c ORDER BY c."order" ASC) c
                 ON c."listId" = l.id
         LEFT JOIN boards b
-                ON l."boardId" = b.id
+                ON l."boardId" = b.id AND b.id=:bid
         LEFT JOIN teams t
                 ON b."teamId" = t.id
         LEFT JOIN "teamUsers" tu
                 ON t.id = tu."teamId"
         WHERE (tu."userId" = :uid OR 
                c."ownerId" = :uid OR
-               l."ownerId" = :uid) AND b.id=:bid
+               l."ownerId" = :uid)
         GROUP BY l.id
         ORDER BY l."order" ASC;
     `;
