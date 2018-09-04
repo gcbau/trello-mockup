@@ -12,7 +12,7 @@ router.get('/card/:uid/:bid', function(req,res)
     let query = `
         SELECT l.id listId, json_agg(c.*) cards
         FROM lists l
-        LEFT JOIN (SELECT c.* FROM cards c ORDER BY c."order" DESC) c
+        LEFT JOIN (SELECT c.* FROM cards c ORDER BY c."order" ASC) c
                 ON c."listId" = l.id
         LEFT JOIN boards b
                 ON l."boardId" = b.id
@@ -59,10 +59,36 @@ router.post('/card', function(req,res)
     })
 });
 
-router.patch('/card/position', function(req,res) 
+router.patch('/card/position', function(req,res, next) 
 {
-    let cards = req.body.cards;
-    let listId = req.body.listId;
+    // get parameters
+    let cards = JSON.parse(req.body.cards);
+
+    // build queries
+    let queries = '';
+    for (let i=0; i<cards.length; ++i) {
+        let card = cards[i];
+        console.log(card);
+        queries += `
+            UPDATE "cards"
+            SET "order" = ${card.order},
+                "listId"= ${card.lid}
+            WHERE "id" = ${card.cid}
+            RETURNING *;
+        `;
+    }
+
+    // execute queries
+    db.sequelize.query(queries, {
+        type: db.sequelize.QueryTypes.UPDATE
+    })
+    .then( hello => {
+        res.status(200).json(hello);
+    })
+    .error( err => {
+        console.error(err);
+        next(err);
+    });
 });
 
 module.exports = router;

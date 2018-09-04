@@ -27,8 +27,20 @@ function setupCardsSortables()
         draggable: '.card'
     });
 
-    cardSortable.on('sortable:stop', (event) => {
-        console.log('cardSortable:stop => ', event);
+    cardSortable.on('sortable:stop', (event) => 
+    {
+        console.log(event);
+        let $card = $(event.data.dragEvent.data.source);
+        let oldContainer = event.data.oldContainer;
+        let newContainer = event.data.newContainer;
+
+        let oldListId = $(oldContainer).closest('.list').attr('id');
+        let newListId = $(newContainer).closest('.list').attr('id');
+
+        // change new list inner order
+        setTimeout(function() {
+            updateCardPositions($card.attr('id'), newListId, oldListId);
+        }, 50);
     });
 }
 
@@ -45,11 +57,11 @@ function refreshLists(e)
     setTimeout(function() 
     {
         lists = $content.children('.list').toArray();
-        updatePositions();
+        updateListPositions();
     }, 1);
 }
 
-function updatePositions()
+function updateListPositions()
 {
     let data = []
     for (let i=0; i<lists.length; ++i) {
@@ -61,12 +73,37 @@ function updatePositions()
         });
     }
 
-    console.log(data);
     $.ajax({
         url: 'http://localhost:3000/list/position',
         method: 'patch',
         data: {
             lists: JSON.stringify(data)
+        }
+    });
+}
+
+function updateCardPositions(cid, lid, oldListId)
+{
+    let data = []
+    let $cards = $(`#${cid}.card`).parent().children();
+    for (let i=0; i<$cards.length; ++i) {
+        let $card = $($cards[i]);
+        let pos = $card.index();
+        data.push({
+            lid: lid,
+            cid: $card.attr('id'),
+            order: pos
+        })
+    } 
+
+    $.ajax({
+        url: 'http://localhost:3000/card/position',
+        method: 'patch',
+        data: {
+            cards: JSON.stringify(data)
+        },
+        success: data => {
+            console.log(data);
         }
     });
 }
@@ -130,7 +167,7 @@ function setupCards()
         for (let i=0; i<lists.length; ++i) {
             let listId = lists[i]["listid"];
             let tempCards = lists[i]["cards"];
-            let $lfoot = $(`#${listId}.list .list-foot`);
+            let $lfoot = $(`#${listId}.list .card-container`);
 
             cards[listId] = tempCards;
             // cards don't exist
@@ -139,7 +176,8 @@ function setupCards()
             for (let j=0; j<tempCards.length; ++j) {
                 let card = tempCards[j];
                 let $card = $(generateCardHTML(card["id"],card["name"]));
-                $card.insertBefore($lfoot);
+                // $card.insertBefore($lfoot);
+                $lfoot.append($card);
             }
         }
         setupCardsSortables();
@@ -174,17 +212,16 @@ function generateListHTML(listId, title)
         <div id="${listId}" class="list">
             <div class="list-wrapper">
                 <h2 class="colHeading">${title}</h2>
-                <ul class="card-container">
-                    <li class="list-foot addRowItem">
-                        <span id="showCardForm" class="active">
-                            + Add a card
-                        </span>
-                        <span id="cardForm">
-                            <button class="addNewCard-btn">Add Card</button>
-                            <button class="closeNewCard-btn">X</button>
-                        </span>
-                    </li>
-                </ul>
+                <ul class="card-container"></ul>
+                <div class="list-foot addRowItem">
+                    <span id="showCardForm" class="active">
+                        + Add a card
+                    </span>
+                    <span id="cardForm">
+                        <button class="addNewCard-btn">Add Card</button>
+                        <button class="closeNewCard-btn">X</button>
+                    </span>
+                </div>
             </div>
         </div>
     `;
@@ -259,8 +296,10 @@ function showCardForm(e)
 {
     // add new list row && change list foot
     let $row = $(newListRow());
-    let $foot = $(e.target).closest('li');
-    $row.insertBefore($foot);
+    let $foot = $(e.target).closest('.list-foot');
+    console.log($foot);
+    // $row.insertBefore($foot);
+    $foot.prev().append($row);
 
     $foot.find('#showCardForm').removeClass('active');
     $foot.find('#cardForm').addClass('active');
@@ -280,7 +319,8 @@ function resizeCardForm()
 function createCard(e) 
 {
     let $btn = $(e.target);
-    let $card = $btn.closest('.list-foot').prev().children('textarea');
+    let $card = $btn.closest('.list-foot').prev().find('textarea');
+    console.log($card);
 
     let cardname = $card.val().trim();
     if (cardname === '') return;

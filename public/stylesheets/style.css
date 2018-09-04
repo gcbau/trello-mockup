@@ -34,7 +34,6 @@ a {
 
 .list {
     font-size: 16px;
-    border-radius: 5px;
     margin: 0 5px;
     padding: 0;
     
@@ -45,7 +44,7 @@ a {
     position: relative;
     border: 1px solid black;
     background: #e2e4e6;
-    padding-bottom: 38px;
+    border-radius: 5px;
 }
 
 h2 {
@@ -59,6 +58,7 @@ h2 {
     padding: 0;
     margin: 0;
     width: 256px;
+    padding-bottom: 38px;
 }
 
 .card {
@@ -108,6 +108,7 @@ h2 {
     position: absolute;
     bottom: 0;
     left: 0;
+    right: 0;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
@@ -124,23 +125,11 @@ h2 {
 
 
 /** draggable */
-/* .draggable-source--is-dragging {
-    color: rgba(0,0,0,0)!important;
-    background: rgba(0,0,0,.3)!important;
+.card.draggable-source--is-dragging,
+.draggable-source--is-dragging * {
+    background: grey!important;
+    color: grey!important;
 }
-.draggable-source--is-dragging ul li{
-    color: rgba(0,0,0,0)!important;
-    background: rgba(0,0,0,.3)!important;
-    cursor: default;
-}
-.draggable-source--is-dragging div{
-    cursor: default;
-}
-.draggable-source--is-dragging div:hover{
-    cursor: default;
-    background: rgba(0,0,0,.3);
-    color: rgba(0,0,0,0);
-} */
 
 
 
