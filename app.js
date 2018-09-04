@@ -14,6 +14,7 @@ var loginRouter = require('./routes/loginRoute');
 var boardsRouter = require('./routes/boardsRoute');
 var listsRouter = require('./routes/listsRoute');
 var cardsRouter = require('./routes/cardsRoute');
+var cardInfoRouter = require('./routes/cardInfoRoute');
 
 // create app
 var app = express();
@@ -57,6 +58,7 @@ app.use('/', allRouter);
 app.use('/:username/boards', boardsRouter);
 app.use('/', listsRouter);
 app.use('/', cardsRouter);
+app.use('/', cardInfoRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
