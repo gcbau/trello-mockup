@@ -1,5 +1,5 @@
 /*************************************************************
-    All functionalities that involves around boards.html
+        All functionalities that involve lists
  *************************************************************/
 
 var userId;
@@ -74,7 +74,7 @@ function updateListPositions()
     }
 
     $.ajax({
-        url: 'http://localhost:3000/list/position',
+        url: `http://localhost:3000/board/${boardId}/list`,
         method: 'patch',
         data: {
             lists: JSON.stringify(data)
@@ -90,7 +90,6 @@ function updateCardPositions(cid, lid, oldListId)
         let $card = $($cards[i]);
         let pos = $card.index();
         data.push({
-            lid: lid,
             cid: $card.attr('id'),
             order: pos
         })
@@ -98,7 +97,7 @@ function updateCardPositions(cid, lid, oldListId)
 
     console.log(data);
     $.ajax({
-        url: 'http://localhost:3000/card/position',
+        url: `http://localhost:3000/list/${lid}/card`,
         method: 'patch',
         data: {
             cards: JSON.stringify(data)
@@ -266,7 +265,8 @@ function displayList(data)
     cards[data.id] = [];
     console.log(cards);
     listSortable.addContainer(document.querySelectorAll('.list'));
-    console.log(lists);
+    console.log($('#newColumnForm'));
+    $('#list-form-container')[0].scrollIntoView();
 }
 
 function displayListError(err) 

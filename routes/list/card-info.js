@@ -35,7 +35,7 @@ router.get('/card/:id', function(req,res,next)
 });
 
 //******************//
-//      LABEL
+//  RETRIEVE LABEL
 //******************//
 
 router.post('/label', function(req,res,next)
@@ -100,7 +100,8 @@ function createLabel(req, res, next)
     });
 }
 
-function addLabelToCard(label, req, res, next) {
+function addLabelToCard(label, req, res, next) 
+{
     console.log(" ");
     console.log(label, req.body);
     console.log(" ");
@@ -120,14 +121,54 @@ function addLabelToCard(label, req, res, next) {
             labelId: label.id
         }
     })
-    .then( (labelcard) => {
+    .then( () => {
         res.status(200).json(label);
     })
     .catch( (err) => {
         console.error("ERROR in addLabelToCard()");
         console.error(err);
-        next(createError(err));
+
+        switch(err.name) {
+            case 'SequelizeUniqueConstraintError': {
+                res.status(200).json(label);
+                break;
+            }
+            default:
+                next(createError(err));
+        }
     });
 }
+
+//**************************//
+//   DELETE LABEL IN CARD
+//**************************//
+
+router.delete('/card/:cardId/label/:labelId', function(req, res, next) 
+{
+    console.log(req.params);
+    // build raw query
+    let query = `
+        DELETE FROM "cardLabels" cl
+        WHERE cl."cardId" = :cardId AND cl."labelId" = :labelId
+        RETURNING * ;
+    `;
+
+    // execute raw query
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.DELETE,
+        replacements: req.params
+    })
+    .then( (data) => {
+        console.log(data);
+        res.status(200).json(data);
+    })
+    .catch( (err) => {
+        console.error(err);
+        next(err);
+    })
+
+
+    res.end();
+})
 
 module.exports = router;
