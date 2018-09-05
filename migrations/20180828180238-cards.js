@@ -35,6 +35,20 @@ module.exports = {
       description: { type: Sequelize.STRING,  allowNull: false },
       order:       { type: Sequelize.INTEGER, allowNull: false },
       createdOn: { type: Sequelize.DATE, defaultValue: Sequelize.NOW }
+    })
+    .then(() => {
+      return queryInterface.addIndex(
+        table,
+        ['name'], {
+          indexType: 'BTREE'
+      });
+    })
+    .then(() => {
+      return queryInterface.addIndex(
+        table,
+        ['order'], {
+          indexType: 'BTREE'
+      });
     });
   },
 

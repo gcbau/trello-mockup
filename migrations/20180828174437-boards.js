@@ -35,6 +35,27 @@ module.exports = {
       name: { type: Sequelize.STRING, allowNull: false },
       lastViewed: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
       createdOn: { type: Sequelize.DATE, defaultValue: Sequelize.NOW }
+    })
+    .then(() => {
+      return queryInterface.addIndex(
+        table,
+        ['name'], {
+          indexType: 'BTREE'
+      });
+    })
+    .then(() => {
+      return queryInterface.addIndex(
+        table,
+        ['createdOn'], {
+          indexType: 'BTREE'
+      });
+    })
+    .then(() => {
+      return queryInterface.addIndex(
+        table,
+        ['lastViewed'], {
+          indexType: 'BTREE'
+      });
     });
   },
 
