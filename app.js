@@ -7,14 +7,13 @@ var logger = require('morgan');
 var cors = require('cors');
 var session = require('client-sessions');
 
-var checkRouter = require('./routes/check');
 var allRouter   = require('./routes/all');
 
-var loginRouter = require('./routes/loginRoute');
-var boardsRouter = require('./routes/boardsRoute');
-var listsRouter = require('./routes/listsRoute');
-var cardsRouter = require('./routes/cardsRoute');
-var cardInfoRouter = require('./routes/cardInfoRoute');
+var loginRouter = require('./routes/login');
+var boardsRouter = require('./routes/board/');
+var listsRouter = require('./routes/list/');
+var cardsRouter = require('./routes/list/card');
+var cardInfoRouter = require('./routes/list/card-info');
 
 // create app
 var app = express();
@@ -29,9 +28,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+// CORS
 app.use(cors());
 
+// COOKIE
 app.use(session({
   cookieName: 'session',
   secret: 'random_string_goes_here',
@@ -39,22 +39,21 @@ app.use(session({
   activeDuration: 5 * 60 * 1000,
 }));
 
-app.use(function(req, res, next) {
-  console.log('MIDDLEWARE => ', req.session);
-  // req.session.reset();
+// LOGIN
+app.use('/home', loginRouter);
+
+app.use(function(req, res, next) 
+{ // check if user is logged in
   if (req.session && req.session.user) {
     req.session.user = req.session.user;  //refresh the session value
     next();
   } else {
-    next();
+    res.redirect('/home');
   }
 });
 
-app.use('/home', loginRouter);
-
-app.use('*', checkRouter);
+// CONTENT
 app.use('/', allRouter);
-
 app.use('/:username/boards', boardsRouter);
 app.use('/', listsRouter);
 app.use('/', cardsRouter);

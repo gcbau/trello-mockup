@@ -10,7 +10,7 @@
 
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
     <script src="/javascripts/lists.js"></script>
-    <script src="/javascripts/cards.js"></script>
+    <script src="/javascripts/card_info.js"></script>
 </head>
 
 <body>
@@ -31,6 +31,7 @@
         </ul>
     </nav>
 
+    <!-- lists and cards -->
     <div id="content">
         <div id="list-form-container" class="table-cell-active">
                 <button id="addColumnBtn" class="active">Add List Item</button>
@@ -42,37 +43,35 @@
         </div>
     </div>
 
+    <!-- card information -->
     <div class="card-info-modal">
         <div class="modal-background"></div>
         <div class="modal-info-container">
-            <div id="close-modal-info-btn">X</div>
+            <div id="close-modal-info-btn"><i class="fas fa-times"></i></div>
             <ul class="main">
                 <li id="title-content">
-                    <h3>Title</h3>
-                    <span>in list bla</span>
+                    <h3><i class="far fa-window-maximize"></i>Title</h3>
                 </li>
                 <li id="labels-content">
-                    <span>Labels</span>
+                    <span><i class="fas fa-tags"></i>Labels</span>
                     <div class="labels-container">
                         <div class="label">hello <span class="del-label-btn">X</span></div>
                         <div contenteditable="true" id="label-input"></div>
                     </div>
                 </li>
                 <li id="description-content">
-                    <span>Description</span>
+                    <span><i class="fas fa-list"></i>Description</span>
                     <div id="description">hello</div>
                 </li>
                 <li id="comment-content">
-                    <span>Add Comment</span>
+                    <span><i class="fas fa-comment"></i> Add Comment</span>
                     <textarea id="comment"></textarea>
                 </li>
                 <li id="activity-content">
-                    <span>Activity</span>
-                    <div id="activity-container">
-                    </div>
+                    <span><i class="fas fa-chart-line"></i>Activity</span>
+                    <div id="activity-container"></div>
                 </li>
             </ul>
-            <div class="side"></div>
         </div>
     </div>
 </body>
