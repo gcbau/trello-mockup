@@ -33,13 +33,13 @@
     <div id="board-content">
         <div id="recently-viewed" class="team">
             <div class="team-heading">
-                <i class="far fa-clock"></i>Recently Viewed
+                <i class="far fa-clock"></i><span>Recently Viewed</span>
             </div>
             <div class="team-content"></div>
         </div>
         <div id="personal" class="team">
             <div class="team-heading">
-                <i class="fas fa-user"></i>Personal Boards
+                <i class="fas fa-user"></i><span>Personal Boards</span>
             </div>
             <div class="team-content">
                 <!-- personal boards ejs -->
@@ -58,7 +58,7 @@
             <% let boards = team.boards %>
             <div id=<%= team.teamId %> class="team">
                 <div class="team-heading">
-                    <i class="fas fa-user"></i><%= team.teamName %>
+                    <i class="fas fa-user"></i><span><%= team.teamName %></span>
                 </div>
                 <div class="team-content">
                     <% if (boards[0] != null) { %>

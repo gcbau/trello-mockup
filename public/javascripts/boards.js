@@ -155,7 +155,7 @@ function createNewTeam(e)
     })
     .done( data => {
         console.log(data);
-        displayTeam(data.id, data.name, $btn);
+        displayTeam(data.id, data.name, $('#create-new-team-btn'));
     })
     .fail( err => {
         console.err(err);
