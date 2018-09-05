@@ -68,6 +68,16 @@
     margin-right: 8px;
 }
 
+#home-nav,
+#boards-nav {
+    cursor: pointer;
+}
+
+#home-nav a {
+    outline: none;
+    text-decoration: none;
+    color: inherit;
+}
 
 /**
 *   search-nav
