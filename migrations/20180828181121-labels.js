@@ -16,6 +16,7 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
+      createdOn: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
       name: { type: Sequelize.STRING, allowNull: false, unique: true }
     });
   },
