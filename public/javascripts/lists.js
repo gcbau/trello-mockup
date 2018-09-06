@@ -182,6 +182,14 @@ function setupCards()
             }
         }
         setupCardsSortables();
+
+        // card_info.js stuff
+        let hash = window.location.hash;
+        if (hash) {
+            console.log(hash);
+            let $card = $(`${hash}.card`);
+            $card.click();
+        }
     })
 }
 

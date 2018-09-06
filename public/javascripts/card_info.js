@@ -105,7 +105,7 @@ function labelAutocomplete(e)
     else if (e.key === 'Backspace') {
         if (val === '') {
             if ($target.prev().length) {
-                $target.prev().remove();
+                $target.prev().find('.del-label-btn').click();
             }
         }
     }
@@ -152,7 +152,6 @@ function displayLabel(val, $target)
 
 $(function() 
 {
-
     // show & hide modal
     $('body').on('click', '.card', displayCardModal);
     $('body').on('click', '.modal-background', hideCardModal);
@@ -161,4 +160,6 @@ $(function()
     $('body').on('keydown', '#label-input',labelAutocomplete);
     $('.labels-container').on('click', labelFocus);
     $('.labels-container').on('click', '.del-label-btn', labelRemove);
+
+    $(window).on('hashchange', e => { $(`${window.location.hash}.card`).click() });
 })

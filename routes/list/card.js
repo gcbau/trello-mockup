@@ -12,7 +12,7 @@ router.get('/card/:uid/:bid', function(req,res)
     let query = `
         SELECT l.id listId, json_agg(c2.*) cards
         FROM lists l
-        LEFT JOIN (SELECT c.* FROM cards c ORDER BY c."order" DESC) c2
+        LEFT JOIN (SELECT c.* FROM cards c ORDER BY c."order") c2
                 ON c2."listId" = l.id
         LEFT JOIN boards b
                 ON l."boardId" = b.id AND b.id=:bid

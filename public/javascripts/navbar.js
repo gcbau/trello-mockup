@@ -2,26 +2,22 @@
     All functionalities that involves around the nav bar
  *******************************************************/
 
-/** main */
-$(function() {
-    var $showBoards  = $('#boards-nav');
-    var $showProfile = $('#profile-nav');
-    var $showNots    = $('#notifications-nav');
+//*********************//
+//  HTML GENERATORS
+//*********************//
 
-    $showBoards.click(displayBoards);
-    $showProfile.click(displayProfile);
-    $showNots.click(displayNotifications);
+function generateBoardItemResult(board) {
+    return `
+        <div class="board-link-container">
+            <a href="/b/${board.id}/${board.name}">${board.name}</a>
+        </div>
+    `;
+}
 
-    var $search  = $('#search-nav');
+//******************//
+// SIDE BAR DISPLAY
+//******************//
 
-    $search.click(displaySearchBar);
-    $search.on('click', '.close-search-btn', hideSearchBar);
-    $search.on('keydown', '#search-input', checkToSearch)
-})
-
-/**
- *      display/hide side bars
- */
 function displayBoards() {
     displaySideBar($('.boards-sidebar'));
 }
@@ -40,9 +36,10 @@ function displaySideBar($sidebar) {
     }
 }
 
-/**
- *      display/hide search bar
- */
+//*********************//
+//  SEARCH BAR DISPLAY
+//*********************//
+
 function displaySearchBar(e) {
     let $target = $(e.target);
     let id = $target.attr('id');
@@ -54,7 +51,8 @@ function displaySearchBar(e) {
         .addClass('search-extended')
         .empty()
         .append('<input type="text" id="search-input"/>')
-        .append('<i class="fas fa-times close-search-btn"></i>');
+        .append('<i class="fas fa-times close-search-btn"></i>')
+        .append('<div id="search-results"></div>');
 
     $('#search-input').focus();
 }
@@ -68,56 +66,89 @@ function hideSearchBar(e) {
         .append('<div class="search-icon"><i class="fas fa-search"></i></div>');
 }
 
-/**
- * 
- */
-function checkToSearch(e) {
-    let val = $(e.target).val().trim();
-    if (val === '' || e.key !== 'Enter') {
-        return;
-    }
+//*********************//
+//  SEARCH FUNCTIONS
+//*********************//
 
-    loopThroughTeams(val);
-}
+var timeout;
 
-function loopThroughTeams(val) {
-    let matches = [];
-    let teamIds = Object.keys(cache['teams']);
-    for (let i=0; i<teamIds.length; ++i) {
-        let tid = teamIds[i];
-        matches = matches.concat(searchForBoards(val, cache['teams'][tid]['boards']));
-    }
-
-    console.log(matches);
-    return matches;
-}
-
-function searchForBoards(val, boards) {
-    let matches = [];
-    let bids = Object.keys(boards);
-    for (let i=0; i<bids.length; ++i) {
-        let bid = bids[i];
-        let bname = boards[bid]['name'];
-        console.log('board name: ', bname);
-        if (bname === val) {
-            matches.push(boards[bid]);
+function checkToSearch(e)
+{
+    // wait for user to stop typing
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(function() {
+        console.log('checking search input');
+        let query = $(e.target).val().trim() + '%';
+        if ('%' === query) {
+            $('#search-results').empty();
+            $('#search-results').removeClass('search-active');
+            return;
         }
-        matches = matches.concat(searchForCards(val, boards[bid]['lists']));
-    }
 
-    return matches
+        $('#search-results').addClass('search-active');
+        searchQuery(query);
+    }, 500);
 }
 
-function searchForCards(val, lists) {
-    let matches = [];
-    let cids = Object.keys(lists);
-    for (let i=0; i<cids.length; ++i) {
-        let cid = cids[i];
-        let cname = lists[cid]['name'];
-        console.log('card name: ', cname);
-        if (cname === val) {
-            matches.push(lists[cid]);
+function searchQuery(query) 
+{
+    console.log('searching by input');
+    $.ajax({
+        url: `http://localhost:3000/search?q=${query}`,
+        method: 'GET',
+        success: (data) => {
+            displayResults(data);
+        },
+        error: (err) => {
+            console.error(err);
+        }
+    });
+}
+
+function displayResults(data)
+{
+    console.log('displaying results');
+    let boards = data.boards;
+    let cards  = data.cards;
+    let $searchResults = $('#search-results');
+    $searchResults.empty();
+
+    if (0 < cards.length) {
+        $searchResults.append($('<div id="card-results"><h4>Cards</h4></div>'));
+        let $cards = $('#card-results');
+        for (let i=0; i<cards.length; ++i) {
+            let card = cards[i];
+            console.log(card);
+            $cards.append($(`<a href="/b/${card.boardId}/${card.boardName}#${card.id}">${card.name}</a>`));
         }
     }
-    return matches
+    if (0 < boards.length) {
+        $searchResults.append($('<div id="board-results"><h4>Boards</h4></div>'));
+        let $boards = $('#board-results');
+        for (let i=0; i<boards.length; ++i) {
+            let board = boards[i];
+            $boards.append($(generateBoardItemResult(board)));
+        }
+    }
+
 }
+
+//******************//
+//      MAIN
+//******************//
+
+$(function() {
+    var $showBoards  = $('#boards-nav');
+    var $showProfile = $('#profile-nav');
+    var $showNots    = $('#notifications-nav');
+
+    $showBoards.click(displayBoards);
+    $showProfile.click(displayProfile);
+    $showNots.click(displayNotifications);
+
+    var $search  = $('#search-nav');
+
+    $search.click(displaySearchBar);
+    $search.on('click', '.close-search-btn', hideSearchBar);
+    $search.on('keyup', '#search-input', checkToSearch)
+})

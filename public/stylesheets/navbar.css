@@ -91,7 +91,7 @@
 #search-nav #show-search-input {
     margin: 0;
     padding: 0;
-    height: 18px;
+    height: 32px;
     cursor: text;
 }
 #search-nav .close-search-btn,
@@ -181,4 +181,48 @@
     height: 100%;
     background: white;
     border-radius: 5px;
+}
+
+
+/********************/
+/*  SEARCH RESULTS  */
+/********************/
+
+#search-results {
+    position: absolute;
+    background: white;
+    top: 40px;
+    left: 0;
+    width: 125%;
+}
+
+.search-active {
+    border: 1px solid black;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+}
+
+#card-results,
+#board-results {
+    padding: 5px;
+}
+
+#search-results h4 {
+    margin: 10px 0;
+}
+
+#search-results a {
+    padding: 10px;
+
+    display: block;
+}
+
+.board-link-container {
+    width: 250px;
+    height: 40px;
+    border: 1px solid black;
+    margin: 5px;
+}
+
+.board-link-container:hover {
+    background: grey;
 }
