@@ -150,5 +150,7 @@ $(function() {
 
     $search.click(displaySearchBar);
     $search.on('click', '.close-search-btn', hideSearchBar);
-    $search.on('keyup', '#search-input', checkToSearch)
+    $search.on('keyup', '#search-input', checkToSearch);
+
+    $('body').on('click', '#search-results a', () => { $('.close-search-btn').click(); });
 })
