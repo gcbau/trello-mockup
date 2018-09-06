@@ -2,6 +2,22 @@ var cardId;
 var currentLabels;
 
 //******************//
+//   HASH CHANGE
+//******************//
+
+function handleHashChangeEvent(e) 
+{
+    let hash = window.location.hash;
+    
+    if (hash) {
+        $(`${hash}.card`).click();
+    } else {
+        $('.modal-background').click();
+    }
+    
+}
+
+//******************//
 //   MODAL DISPLAY
 //******************//
 
@@ -161,5 +177,5 @@ $(function()
     $('.labels-container').on('click', labelFocus);
     $('.labels-container').on('click', '.del-label-btn', labelRemove);
 
-    $(window).on('hashchange', e => { $(`${window.location.hash}.card`).click() });
+    $(window).on('hashchange', handleHashChangeEvent);
 })
