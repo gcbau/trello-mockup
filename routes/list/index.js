@@ -7,7 +7,26 @@ router.get('/b/:bid/:bname', function(req, res) {
     console.log(req.params);
     console.log(' ');
 
-    res.render('lists');
+    // update board's last viewed
+    let query = `
+        UPDATE "boards" b
+        SET "lastViewed" = NOW()
+        WHERE b."id" = :bid
+        RETURNING *;
+    `;
+
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.UPDATE,
+        replacements: req.params
+    })
+    .then( sqlRes => {
+        // render list view
+        res.render('lists');
+    })
+    .catch( err => {
+        console.error(err);
+        next(err);
+    })
 });
 
 router.get('/team', function(req,res) {
