@@ -29,17 +29,16 @@
         </ul>
     </nav>
 
-    <a href="boards.html">Jello</a>
     <div id="board-content">
         <div id="recently-viewed" class="team">
             <div class="team-heading">
-                <i class="far fa-clock"></i><span>Recently Viewed</span>
+                <i class="far fa-clock"></i><span class="team-name">Recently Viewed</span>
             </div>
             <div class="team-content"></div>
         </div>
         <div id="personal" class="team">
             <div class="team-heading">
-                <i class="fas fa-user"></i><span>Personal Boards</span>
+                <i class="fas fa-user"></i><span class="team-name">Personal Boards</span>
             </div>
             <div class="team-content">
                 <!-- personal boards ejs -->
@@ -58,7 +57,7 @@
             <% let boards = team.boards %>
             <div id=<%= team.teamId %> class="team">
                 <div class="team-heading">
-                    <i class="fas fa-user"></i><span><%= team.teamName %></span>
+                    <i class="fas fa-user"></i><span class="team-name"><%= team.teamName %></span><div class="add-member">+ Add Member</div>
                 </div>
                 <div class="team-content">
                     <% if (boards[0] != null) { %>
@@ -116,7 +115,10 @@
 
     <!-- profile sidebar for navigation -->
     <div class="profile-sidebar">
-        <div id="profile-content"></div>
+        <div id="profile-content">
+            <div class="profile-heading">First Last (FL)</div>
+            <div class="log-out">Log Out</div>
+        </div>
     </div>
 
     <!-- notifications sidebar for navigation -->
