@@ -4,6 +4,7 @@
 
 var userId;
 var username;
+var initials;
 var boardId;
 var boardname;
 var teamId;
@@ -116,6 +117,7 @@ function setupUser()
 {
     userId = localStorage.getItem('userId');
     username = localStorage.getItem('username');
+    initials = localStorage.getItem('initials');
     
     let pathname = location.pathname.replace('/b/', '');
     let [ bid, bname ] = pathname.split('/');
@@ -137,8 +139,8 @@ function setupUser()
     // CODE TO DO: check if user really has this board..
 }
 
-function setupLists() 
-{
+function setupLists() // setup lists
+{   
     $.ajax({
         url: `http://localhost:3000/list/${userId}/${boardId}`,
         method: 'get',
@@ -153,17 +155,20 @@ function setupLists()
             $(generateListHTML(id,name)).insertBefore($target);
         }
         lists = data;
+        console.log(lists);
         setupCards();
     });
 }
 
 function setupCards()
 {
+    console.log(boardId);
     $.ajax({
         url: `http://localhost:3000/card/${userId}/${boardId}`,
         method: 'get'
     })
     .then( (lists) => {
+        console.log('cards: ', cards);
         for (let i=0; i<lists.length; ++i) {
             let listId = lists[i]["listid"];
             let tempCards = lists[i]["cards"];
@@ -173,7 +178,6 @@ function setupCards()
             // cards don't exist
             if (!tempCards[0]) continue;
             // cards exist
-            console.log(lists[i]);
             for (let j=0; j<tempCards.length; ++j) {
                 let card = tempCards[j];
                 let $card = $(generateCardHTML(card["id"],card["name"]));
@@ -269,11 +273,10 @@ function displayList(data)
     let $list = $(generateListHTML(data.id, data.name));
     $list.insertBefore($('#list-form-container'));
 
-    lists.push($list);
+    lists.push(data);
     cards[data.id] = [];
-    console.log(cards);
+
     listSortable.addContainer(document.querySelectorAll('.list'));
-    console.log($('#newColumnForm'));
     $('#list-form-container')[0].scrollIntoView();
 }
 
@@ -356,6 +359,9 @@ function saveCard($card, cardname, listId) {
     })
     .then( (data) => {
         $parent.attr('id', data.id);
+        console.log(listId);
+        cards[listId][cards[listId].length] = data;
+        console.log(cards[listId][cards[listId].length-1]);
     })
     .fail( (err) => {
         console.error(err);
@@ -372,6 +378,8 @@ function displayCard($card, $btn, cardname)
     let $foot = $btn.closest('.list-foot');
     $foot.find('#showCardForm').addClass('active');
     $foot.find('#cardForm').removeClass('active');
+
+    setupCardsSortables();
 }
 
 //******************//
