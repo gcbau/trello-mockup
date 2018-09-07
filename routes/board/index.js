@@ -53,16 +53,18 @@ function renderPage(res, data)
             personalboards: [],
             teams: []
         });
-    } else if (1 === data.length) {
-        res.render('boards', {
-            personalboards: [],
-            teams: data
-        });
     } else {
         let personal = data[data.length-1];
         let teams = data.slice(0, data.length-1);
+
+        if (personal.teamId) {
+            personal.boards = [];
+            teams = data;
+        }
         console.log(' ');
-        console.log(data);
+        console.log(personal);
+        console.log(' ');
+        console.log(teams);
         console.log(' ');
         res.render('boards', {
             personalboards: personal.boards,
