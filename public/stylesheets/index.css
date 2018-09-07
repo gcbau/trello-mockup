@@ -192,6 +192,10 @@ html, body {
     border-radius: 5px;
 }
 
+.create-new-board-btn {
+    background: grey;
+}
+
 /** Team Creation Form */
 #create-new-team-btn {
     margin: 0;
