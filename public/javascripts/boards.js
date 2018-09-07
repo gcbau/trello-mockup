@@ -124,15 +124,25 @@ function showTeamForm(e)
     let offset  = $(e.target).offset();
     let $form = $('.team-creation-container');
     console.log($form);
-    $form.addClass('active');
-    $form.css('top', offset.top+'px');
+    
     $form.css('left', offset.left+'px');
+
+    console.log($('body').height(), offset.top+300);
+    if (screen.height < offset.top+300) {
+        $form.css('top', (offset.top-264)+'px');
+    } else {
+        $form.css('top', offset.top+'px');
+    }
+
+    $form.addClass('active');
+    $('#team-title-input').focus();
 }
 
 function hideTeamForm() 
 {   /** hide new team form */
     let $form = $('.team-creation-container');
     $form.removeClass('active');
+    $('#new-team-form').trigger('reset');
 }
 
 function createNewTeam(e)
@@ -170,6 +180,27 @@ function displayTeam(teamId, title, $target)
 }
 
 //******************//
+//    ADD MEMBER  
+//******************//
+
+function displayMembers(e) 
+{
+    console.log(e.target);
+    let teamId = $(e.target).closest('.team').attr('id');
+    console.log(teamId);
+    $.ajax({
+        url: `http://localhost:3000/team/${teamId}/members`,
+        method: 'get',
+        success: members => {
+            console.log(members);
+        },
+        error: err => {
+            console.error(err);
+        }
+    })
+}
+
+//******************//
 //  MAIN FUNCTION 
 //******************//
 
@@ -189,4 +220,6 @@ $(function() {
     $body.on('click', '#create-new-team-btn', showTeamForm);
     $body.on('click', '#form-close-btn', hideTeamForm);
     $body.on('click', '#create-team-btn', createNewTeam);
+
+    $body.on('click', '.add-member', displayMembers);
 });

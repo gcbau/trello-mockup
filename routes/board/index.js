@@ -10,13 +10,50 @@ router.use(function(req, res, next) {
 /**
  *  Render initial page
  */
-router.get('/', function(req, res) 
+router.get('/', function(req, res, next) 
 {
-    console.log('RENDER INTIAL BOARDS => ', req.session.user);
-    console.log(' ');
+    getRecentBoards(req, res, next);
+}); 
+
+function getRecentBoards(req, res, next) 
+{
     let user = req.session.user;
     let uid  = user.id;
 
+    // build query to get recent boards
+    let query = `
+        SELECT DISTINCT b.*
+        FROM "boards" b
+        LEFT JOIN "teams" t
+                on b."teamId" = t.id
+        LEFT JOIN "teamUsers" tu
+                on t.id = tu."teamId"
+        WHERE tu."userId" = :uid OR b."ownerId" = :uid
+        ORDER BY  b."lastViewed" DESC
+        LIMIT 4;
+    `;
+
+    // execute query
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.SELECT,
+        replacements: { uid: uid }
+    })
+    .then( recentBoards => {
+        console.log(recentBoards);
+        getPersonalTeamBoards(recentBoards, req, res, next);
+    })
+    .catch( err => {
+        console.error(err);
+        next(err);
+    })
+}
+
+function getPersonalTeamBoards(recentboards, req, res, next)
+{
+    let user = req.session.user;
+    let uid  = user.id;
+
+    // build query to get personal & team boards
     let query = `
         SELECT t.id "teamId", t.name "teamName", "tb"."boards"
         FROM (SELECT t.id, json_agg(DISTINCT b.*) AS "boards"
@@ -38,20 +75,21 @@ router.get('/', function(req, res)
         },
         type: db.sequelize.QueryTypes.SELECT
     })
-    .then( data => {
-        renderPage(res, data);
+    .then( otherBoards => {
+        renderPage(res, recentboards, otherBoards);
     })
     .error( err => {
         next(createError(err));
     });
-});
+}
 
-function renderPage(res, data)
+function renderPage(res, recentBoards, data)
 {
     if (0 === data.length) {
         res.render('boards', {
             personalboards: [],
-            teams: []
+            teams: [],
+            recentBoards: recentBoards
         });
     } else {
         let personal = data[data.length-1];
@@ -66,9 +104,11 @@ function renderPage(res, data)
         console.log(' ');
         console.log(teams);
         console.log(' ');
+        console.log(recentBoards);
         res.render('boards', {
             personalboards: personal.boards,
-            teams: teams
+            teams: teams,
+            recentBoards: recentBoards
         });
     }
 }

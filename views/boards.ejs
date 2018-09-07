@@ -34,7 +34,14 @@
             <div class="team-heading">
                 <i class="far fa-clock"></i><span class="team-name">Recently Viewed</span>
             </div>
-            <div class="team-content"></div>
+            <div class="team-content">
+                <!-- recent boards ejs -->
+                <% for(let i=0; i<recentBoards.length; ++i) { %>
+                    <div id=<%= recentBoards[i].id %> class="board-icon">
+                        <a href=<%= '/b/'+recentBoards[i].id+'/'+recentBoards[i].name.replace(/ /g,'-') %> > <%= recentBoards[i].name %></a>
+                    </div>
+                <% } %>
+            </div>
         </div>
         <div id="personal" class="team">
             <div class="team-heading">
@@ -44,7 +51,7 @@
                 <!-- personal boards ejs -->
                 <% for(let i=0; i<personalboards.length; ++i) { %>
                     <div id=<%= personalboards[i].id %> class="board-icon">
-                        <a href=<%= '/b/'+personalboards[i].id+'/'+personalboards[i].name %>><%= personalboards[i].name %></a>
+                        <a href=<%= '/b/'+personalboards[i].id+'/'+personalboards[i].name.replace(/ /g,'-') %>><%= personalboards[i].name %></a>
                     </div>
                 <% } %>
                 <!-- add new board -->
