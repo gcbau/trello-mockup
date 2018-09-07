@@ -34,11 +34,14 @@ router.get('/team', function(req,res) {
 
 router.get('/list/:id/:bid', function(req,res) {
     let query = `
-        SELECT l.*
+        SELECT DISTINCT l.*
         FROM "lists" l
         JOIN "boards" b
             ON l."boardId" = b."id"
-        WHERE l."ownerId" = :id AND b."id" = :bid
+        LEFT JOIN "teamUsers" tu
+            ON b."teamId" = tu."teamId"
+        WHERE (l."ownerId" = :id OR tu."userId" = :id)
+            AND b."id" = :bid
         ORDER BY l.order;
     `;
 
