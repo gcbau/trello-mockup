@@ -53,16 +53,22 @@ function renderPage(res, data)
             personalboards: [],
             teams: []
         });
+    } else if (1 === data.length) {
+        res.render('boards', {
+            personalboards: [],
+            teams: data
+        });
+    } else {
+        let personal = data[data.length-1];
+        let teams = data.slice(0, data.length-1);
+        console.log(' ');
+        console.log(data);
+        console.log(' ');
+        res.render('boards', {
+            personalboards: personal.boards,
+            teams: teams
+        });
     }
-    let personal = data[data.length-1];
-    let teams = data.slice(0, data.length-1);
-    console.log(' ');
-    console.log(data);
-    console.log(' ');
-    res.render('boards', {
-        personalboards: personal.boards,
-        teams: teams
-    });
 }
 
 /**
