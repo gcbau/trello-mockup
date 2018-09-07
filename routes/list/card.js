@@ -10,21 +10,17 @@ router.get('/card/:uid/:bid', function(req,res)
     console.log(' ');
 
     let query = `
-        SELECT l.id listId, json_agg(c2.*) cards
-        FROM lists l
-        LEFT JOIN (SELECT c.* FROM cards c ORDER BY c."order") c2
-                ON c2."listId" = l.id
-        LEFT JOIN boards b
-                ON l."boardId" = b.id AND b.id=:bid
-        LEFT JOIN teams t
-                ON b."teamId" = t.id
-        LEFT JOIN "teamUsers" tu
-                ON t.id = tu."teamId"
-        WHERE (tu."userId" = :uid OR 
-               c2."ownerId" = :uid OR
-               l."ownerId" = :uid)
+        SELECT l.id listId, json_agg(c.*) cards
+        FROM "boards" b
+        LEFT JOIN "lists" l
+                ON l."boardId" = b."id"
+        LEFT JOIN (SELECT *
+                FROM "cards" c
+                ORDER BY c."listId", c."order") c
+                ON c."listId" = l."id"
+        WHERE b."id" = :bid
         GROUP BY l.id
-        ORDER BY l."order" ASC;
+        ORDER BY l.order;
     `;
 
     db.sequelize.query(query, {
