@@ -19,7 +19,7 @@ router.get('/', function(req, res)
 
     let query = `
         SELECT t.id "teamId", t.name "teamName", "tb"."boards"
-        FROM (SELECT t.id, json_agg(b.*) AS "boards"
+        FROM (SELECT t.id, json_agg(DISTINCT b.*) AS "boards"
             FROM "teams" t
             FULL OUTER JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
                 ON t."id" = "b"."teamId"
