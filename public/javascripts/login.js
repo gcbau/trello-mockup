@@ -25,7 +25,7 @@ function loginEvent(e)
     }
 
     $.ajax({
-        url: 'http://localhost:3000/home/login',
+        url: '/home/login',
         method: 'POST',
         data: {
             email: email,
@@ -66,7 +66,7 @@ function signUpEvent(e)
     }
     
     $.ajax({
-        url: 'http://localhost:3000/home/signup',
+        url: '/home/signup',
         method: 'POST',
         data: {
             first: first,
@@ -79,8 +79,10 @@ function signUpEvent(e)
         },
         error: (err) => {
             console.log(err);
-            let msg = err.responseJSON.error.message;
-            showError(msg);
+            if (err.responseJSON.error) {
+                let msg = err.responseJSON.error.message;
+                showError(msg);
+            }
         }
     })
 } 
