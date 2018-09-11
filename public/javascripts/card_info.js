@@ -52,7 +52,7 @@ function displayCardModal(e)
 
     // get card information
     $.ajax({
-        url: `http://localhost:3000/card/${cardId}`,
+        url: `/card/${cardId}`,
         method: 'get',
         success: data => {
             // add card info to html
@@ -124,7 +124,7 @@ function labelRemove(e)
     let labelId = currentLabels[labelname];
 
     $.ajax({
-        url: `http://localhost:3000/card/${cardId}/label/${labelId}`,
+        url: `/card/${cardId}/label/${labelId}`,
         method: 'delete',
         success: (data) => {
             console.log("successfully deleted label: ", data);
@@ -170,7 +170,7 @@ function createLabel(val, $target)
         return;
     }
     $.ajax({
-        url: 'http://localhost:3000/label',
+        url: '/label',
         method: 'post',
         data: {
             name: val,
@@ -227,7 +227,7 @@ function createComment(e)
     console.log(comment, "by", initials);
 
     $.ajax({
-        url: `http://localhost:3000/card/${cardId}/comment`,
+        url: `/card/${cardId}/comment`,
         method: 'post',
         data: {
             body: comment

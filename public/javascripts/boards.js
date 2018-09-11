@@ -31,7 +31,7 @@ function setup()
 {   
     userId = localStorage.getItem('userId');
     username = localStorage.getItem('username');
-    let url = `http://localhost:3000/all/${userId}`;
+    let url = `/all/${userId}`;
     console.log(url, userId);
 
     $.ajax({
@@ -89,7 +89,7 @@ function createNewBoard(e)
     }
 
     $.ajax({
-        url: `http://localhost:3000/${username}/boards/board`,
+        url: `/${username}/boards/board`,
         method: 'POST',
         data: data
     })
@@ -150,7 +150,7 @@ function createNewTeam(e)
     if ('' === title) return;
 
     $.ajax({
-        url: `http://localhost:3000/${username}/boards/team`,
+        url: `/${username}/boards/team`,
         method: 'POST',
         data: {
             name: title,
@@ -200,7 +200,7 @@ function searchMembers(e)
 
     console.log(userInput);
     $.ajax({
-        url: `http://localhost:3000/user?name=${userInput}`,
+        url: `/user?name=${userInput}`,
         method: 'get',
         success: data => {
             console.log(data);
@@ -237,7 +237,7 @@ function sendInvitation(e)
     let teamId = $target.closest('.team').attr('id');
 
     $.ajax({
-        url: 'http://localhost:3000/invite',
+        url: '/invite',
         method: 'post',
         data: {
             receiverId: receiverId,

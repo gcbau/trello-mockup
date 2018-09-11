@@ -49,7 +49,7 @@ function displayNotifications()
         $sidebar.addClass('active');
         // fetch all notifications
         $.ajax({
-            url: `http://localhost:3000/${userId}/notifications`,
+            url: `/${userId}/notifications`,
             method: 'get',
             success: (res) => {
                 console.log(res);
@@ -129,7 +129,7 @@ function searchQuery(query)
 {
     query = query.replace(' ', '-');
     $.ajax({
-        url: `http://localhost:3000/search?q=${query}`,
+        url: `/search?q=${query}`,
         method: 'GET',
         success: (data) => {
             displayResults(data);

@@ -75,7 +75,7 @@ function updateListPositions()
     }
 
     $.ajax({
-        url: `http://localhost:3000/board/${boardId}/list`,
+        url: `/board/${boardId}/list`,
         method: 'patch',
         data: {
             lists: JSON.stringify(data)
@@ -98,7 +98,7 @@ function updateCardPositions(cid, lid, oldListId)
 
     console.log(data);
     $.ajax({
-        url: `http://localhost:3000/list/${lid}/card`,
+        url: `/list/${lid}/card`,
         method: 'patch',
         data: {
             cards: JSON.stringify(data)
@@ -126,7 +126,7 @@ function setupUser()
     boardname = bname;
 
     $.ajax({
-        url: `http://localhost:3000/team?bid=${boardId}`,
+        url: `/team?bid=${boardId}`,
         method: 'get',
     })
     .then( (tid) => {
@@ -142,7 +142,7 @@ function setupUser()
 function setupLists() // setup lists
 {   
     $.ajax({
-        url: `http://localhost:3000/list/${userId}/${boardId}`,
+        url: `/list/${userId}/${boardId}`,
         method: 'get',
     })
     .then( (data) => {
@@ -164,7 +164,7 @@ function setupCards()
 {
     console.log(boardId);
     $.ajax({
-        url: `http://localhost:3000/card/${userId}/${boardId}`,
+        url: `/card/${userId}/${boardId}`,
         method: 'get'
     })
     .then( (lists) => {
@@ -255,7 +255,7 @@ function createList(e)
     if (listname === '') return;
 
     $.ajax({
-        url: 'http://localhost:3000/list',
+        url: '/list',
         method: 'post',
         data: {
             ownerId: userId,
@@ -349,7 +349,7 @@ function createCard(e)
 function saveCard($card, cardname, listId) {
     let $parent = $card.parent();
     $.ajax({
-        url: 'http://localhost:3000/card',
+        url: '/card',
         method: 'post',
         data: {
             name: cardname,
