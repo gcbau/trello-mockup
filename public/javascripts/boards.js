@@ -2,12 +2,6 @@
     All functionalities that involves around index.html
  *******************************************************************/
 
-var userId;
-var username;
-var teams;
-var $body;
-var $content;
-
 //******************//
 //  HELPER METHODS  
 //******************//
@@ -110,9 +104,10 @@ function createNewBoard(e)
 
 function displayBoard(tid, bid, bname, $target) 
 {   /* display board in html */
-    let stringHTML = generateBoardIcon(tid, bid, bname);
-    $(stringHTML).insertBefore($target);
-    hideBoardModal();
+    let $board = $(generateBoardIcon(tid, bid, bname));
+    $board.insertBefore($target);
+
+    window.location.href = $board.find('a').attr('href');
 }
 
 //******************//
@@ -155,7 +150,7 @@ function createNewTeam(e)
     if ('' === title) return;
 
     $.ajax({
-        url: 'http://localhost:3000/${username}/boards/team',
+        url: `http://localhost:3000/${username}/boards/team`,
         method: 'POST',
         data: {
             name: title,
@@ -183,26 +178,89 @@ function displayTeam(teamId, title, $target)
 //    ADD MEMBER  
 //******************//
 
-function displayMembers(e) 
+function displayMemberSearch(e)
 {
-    console.log(e.target);
-    let teamId = $(e.target).closest('.team').attr('id');
-    console.log(teamId);
+    if (e.target !== e.currentTarget) return;
+
+    let form = `   
+        <form id="member-form">
+            <input id="member-name-input" type="text"/>
+            <input id="member-form-submit" type="submit" value="search"/>
+        </form>`;
+
+    let $btn = $(e.target);
+    $btn.append($(form));
+    $('#member-name-input').trigger('focus');
+}
+
+function searchMembers(e)
+{
+    e.preventDefault();
+    let userInput = $('#member-name-input').val().trim();
+
+    console.log(userInput);
     $.ajax({
-        url: `http://localhost:3000/team/${teamId}/members`,
+        url: `http://localhost:3000/user?name=${userInput}`,
         method: 'get',
-        success: members => {
-            console.log(members);
+        success: data => {
+            console.log(data);
+            displayMemberOptions(data);
         },
         error: err => {
             console.error(err);
         }
-    })
+    });
+}
+
+function displayMemberOptions(users) 
+{
+    let $results = $('<ul id="member-options"></ul>');
+
+    for (let i=0; i<users.length; ++i) {
+        $results.append(`<li class="member-option" data-id=${users[i].id}>${users[i].name}</li>`)
+    }
+
+    $('#member-options').remove();
+    $('#member-form').append($results);
+} 
+
+function hideMemberForm()
+{
+    $('#member-form').remove();
+}
+
+function sendInvitation(e) 
+{
+    let $target = $(e.target);
+    let receiverId = $target.data('id');
+    let senderId = userId;
+    let teamId = $target.closest('.team').attr('id');
+
+    $.ajax({
+        url: 'http://localhost:3000/invite',
+        method: 'post',
+        data: {
+            receiverId: receiverId,
+            senderId: senderId,
+            teamId: teamId
+        },
+        success: (res) => {
+            console.log(res);
+        },
+        error: (err) => {
+            console.error(err);
+        }
+    });
 }
 
 //******************//
 //  MAIN FUNCTION 
 //******************//
+
+var username;
+var $body;
+var $content;
+var clicked;
 
 $(function() {
     // setup
@@ -213,13 +271,37 @@ $(function() {
     $content = $('#board-content');
 
     // event handlers
+    $(document).on('mousedown', (e) => {
+        clicked = e.target;
+        let $active = $(document.activeElement);
+        let $target = $('#member-name-input');
+
+        if($target[0] && $target.is($active)) {
+            if ($(clicked).attr('id') === 'member-name-input') {
+                return;
+            }
+
+            if ($(clicked).attr('id') === 'member-options' || $(clicked).hasClass('member-option')) {
+                setTimeout(() => {
+                    $target.focus();
+                }, 10)
+                return;
+            }
+
+            hideMemberForm();
+        }
+    })
+
     $body.on('click', '.create-new-board-btn', showBoardModal);
     $body.on('click', '.modal-background', hideBoardModal);
     $body.on('click', '#create-board-btn', createNewBoard);
+    $body.on('click', '#modal-close-btn', hideBoardModal);
 
     $body.on('click', '#create-new-team-btn', showTeamForm);
     $body.on('click', '#form-close-btn', hideTeamForm);
     $body.on('click', '#create-team-btn', createNewTeam);
 
-    $body.on('click', '.add-member', displayMembers);
+    $body.on('click', '.add-member', displayMemberSearch);
+    $body.on('submit', '#member-form', searchMembers);
+    $body.on('click', '.member-option', sendInvitation);
 });
