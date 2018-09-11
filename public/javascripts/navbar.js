@@ -32,9 +32,6 @@ function generateInvitationNotification(res) {
 // SIDE BAR DISPLAY
 //******************//
 
-function displayBoards() {
-    displaySideBar($('.boards-sidebar'));
-}
 function displayProfile() {
     displaySideBar($('.profile-sidebar'));
 }
@@ -45,6 +42,35 @@ function displaySideBar($sidebar) {
     } else {
         $sidebar.addClass('active');
     }
+}
+
+//******************//
+//  Boards Sidebar
+//******************//
+
+function displayBoards() {
+    let $sidebar = $('.boards-sidebar');
+    if ($sidebar.hasClass('active')) {
+        $sidebar.removeClass('active');
+    } else {
+        $sidebar.addClass('active');
+    }
+}
+
+function displayTeam(e) 
+{
+    let $btn = $(e.target);
+    let $teamItem = $btn.closest('.team-item');
+    let $teamBoards = $teamItem.find('.team-boards');
+
+    if ($teamBoards.hasClass('active')) {
+        $btn.html('+');
+        $teamBoards.removeClass('active');
+    } else {
+        $btn.html('-');
+        $teamBoards.addClass('active');
+    }
+    console.log($btn);
 }
 
 //******************//
@@ -241,6 +267,9 @@ $(function() {
 
     $('body').on('click', '#search-results a', () => { $('.close-search-btn').click(); });
     
+    // boards
+    $('#sideboards-content').on('click', '.expand-btn', displayTeam);
+
     // notifications
     $('#notifications-content').on('click', '.accept-btn', acceptInvitation);
 })
