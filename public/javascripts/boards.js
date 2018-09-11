@@ -40,9 +40,6 @@ function setup()
     })
     .done( data => {
         console.log(data);
-        // teams[0].boards = data.personal;
-        // teams = teams.concat(data.teams);
-        // console.log(teams);
     })
     .fail( err => {
         console.error(err);

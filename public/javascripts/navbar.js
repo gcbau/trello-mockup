@@ -97,12 +97,31 @@ function acceptInvitation(e)
         },
         success: (res) => {
             console.log(res);
+            updateAfterAccept($btn, res);
         }, 
         error: (err) => {
             console.error(err);
         }
     });
 }
+
+function updateAfterAccept($btn, res)
+{
+    let $alert = $btn.closest('.notification');
+
+    $newTeamBtn = $('#create-new-team-btn');
+    if (!$newTeamBtn[0]) {
+        console.log("we're not in the board's page");
+        $alert.remove();
+        return;
+    } 
+
+    let $newTeam = $(generateTeamRow(res[0].teamId, res[0].teamName));
+    $newTeam.insertBefore($newTeamBtn);
+    $alert.remove();
+}
+
+
 
 //*********************//
 //  SEARCH BAR DISPLAY

@@ -278,7 +278,31 @@ function deleteInvitation(req,res,next)
         replacements: req.body
     })
     .then( sqlres => {
-        res.status(200).json(sqlres);
+        getTeamName(sqlres,req,res,next)
+    })
+    .catch( err => {
+        console.error(err);
+        next(err);
+    })
+}
+
+function getTeamName(inv,req,res,next)
+{
+    // build query
+    let query = `
+        SELECT t."name"
+        FROM "teams" t
+        WHERE t."id" = :teamId
+    `;
+
+    // execute query
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.DELETE,
+        replacements: req.body
+    })
+    .then( sqlres => {
+        inv[0].teamName = sqlres[0].name;
+        res.status(200).json(inv);
     })
     .catch( err => {
         console.error(err);

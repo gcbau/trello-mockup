@@ -93,6 +93,7 @@ function renderPage(req, res, recentBoards, data)
             userId: req.session.user.id
         });
     } else {
+        console.log(data);
         let personal = data[data.length-1];
         let teams = data.slice(0,data.length-1);
 
