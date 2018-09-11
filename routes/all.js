@@ -227,5 +227,63 @@ router.get('/:receiverId/notifications', function(req,res,next)
     })
 });
 
+/***************************/
+/*   Accept Invitation     */
+/***************************/
+router.post('/invitation/accept', function(req,res,next)
+{
+    // add receiver to team
+    addMemberToTeam(req,res,next);
+})
+
+function addMemberToTeam(req,res,next) 
+{
+    // build query
+    let query = `
+        INSERT INTO "teamUsers"
+            ("teamId", "userId")
+        VALUES
+            (:teamId, :receiverId)
+        RETURNING * ;
+    `;
+
+    // execute query
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.INSERT,
+        replacements: req.body
+    })
+    .then( sqlres => {
+        deleteInvitation(req,res,next);
+    })
+    .catch( err => {
+        console.error(err);
+        next(err);
+    })
+}
+
+function deleteInvitation(req,res,next)
+{
+    // build query
+    let query = `
+        DELETE FROM "invitations" i
+        WHERE i."senderId" = :senderId 
+            AND i."receiverId" = :receiverId
+            AND i."teamId" = :teamId
+        RETURNING *;
+    `;
+
+    // execute query
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.DELETE,
+        replacements: req.body
+    })
+    .then( sqlres => {
+        res.status(200).json(sqlres);
+    })
+    .catch( err => {
+        console.error(err);
+        next(err);
+    })
+}
 
 module.exports = router;

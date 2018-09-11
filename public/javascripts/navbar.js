@@ -21,7 +21,7 @@ function generateInvitationNotification(res) {
             <p class="sender-msg">From: <span data-senderId=${res.senderId}><strong>${res.senderName}</strong></span></p>
             <p class="team-msg">Invited to: <strong>${res.teamName}</strong></p>
             <div class="btn-wrapper">
-                <button class="accept-btn" data-teamId=${res.teamId}>Accept</button>
+                <button class="accept-btn" data-teamid=${res.teamId} data-senderid=${res.senderId}>Accept</button>
                 <button class="decline-btn">Decline</button>
             </div>
         </div>
@@ -38,6 +38,18 @@ function displayBoards() {
 function displayProfile() {
     displaySideBar($('.profile-sidebar'));
 }
+
+function displaySideBar($sidebar) {
+    if ($sidebar.hasClass('active')) {
+        $sidebar.removeClass('active');
+    } else {
+        $sidebar.addClass('active');
+    }
+}
+
+//******************//
+//  Notifications
+//******************//
 
 function displayNotifications() 
 {
@@ -69,12 +81,27 @@ function displayNotifications()
     }
 }
 
-function displaySideBar($sidebar) {
-    if ($sidebar.hasClass('active')) {
-        $sidebar.removeClass('active');
-    } else {
-        $sidebar.addClass('active');
-    }
+function acceptInvitation(e)
+{
+    let $btn = $(e.target);
+    let teamId = $btn.data('teamid');
+    let senderId = $btn.data('senderid');
+
+    $.ajax({
+        url: '/invitation/accept',
+        method: 'post',
+        data: {
+            teamId: teamId,
+            senderId: senderId,
+            receiverId: userId
+        },
+        success: (res) => {
+            console.log(res);
+        }, 
+        error: (err) => {
+            console.error(err);
+        }
+    });
 }
 
 //*********************//
@@ -194,4 +221,7 @@ $(function() {
     $search.on('keyup', '#search-input', checkToSearch);
 
     $('body').on('click', '#search-results a', () => { $('.close-search-btn').click(); });
+    
+    // notifications
+    $('#notifications-content').on('click', '.accept-btn', acceptInvitation);
 })

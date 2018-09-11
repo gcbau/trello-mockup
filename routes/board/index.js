@@ -94,12 +94,19 @@ function renderPage(req, res, recentBoards, data)
         });
     } else {
         let personal = data[data.length-1];
-        let teams = data.slice(0, data.length-1);
+        let teams = data.slice(0,data.length-1);
 
         if (personal.teamId) {
-            personal.boards = [];
-            teams = data;
-        }
+            res.render('boards', {
+                personalboards: [],
+                teams: data,
+                allTeams: data,
+                recentBoards: recentBoards,
+                userId: req.session.user.id
+            });
+            return;
+        } 
+
         res.render('boards', {
             personalboards: personal.boards,
             teams: teams,
