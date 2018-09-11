@@ -165,9 +165,9 @@
 }
 
 
-/**
-*   notifications-sidebar
-*/
+/********************/
+/*  Notifications   */
+/********************/
 .notifications-sidebar {
     position: fixed;
     top: 0;
@@ -178,11 +178,57 @@
     padding-top: 44px;
     display: none;
 }
+
 .notifications-sidebar #notifications-content {
     width: 100%;
     height: 100%;
     background: white;
+
+    border: 1px solid grey;
     border-radius: 5px;
+
+    padding: 0 10px 10px 10px;
+}
+
+.notification {
+    margin-top: 10px;
+
+    border: 1px solid grey;
+    border-radius: 5px;
+
+    padding: 10px;
+}
+
+.date {
+    margin: 0;
+    font-size: 12px;
+}
+
+.sender-msg {
+    margin: 0;
+}
+
+.team-msg {
+    margin: 0;
+    display: inline-block;
+}
+
+.btn-wrapper {
+    float: right;
+}
+
+.accept-btn,
+.decline-btn {
+    border: 1px solid grey;
+    border-radius: 5px;
+
+    cursor: pointer;
+}
+
+.accept-btn:hover,
+.decline-btn:hover {
+    background: grey;
+    color: white;
 }
 
 

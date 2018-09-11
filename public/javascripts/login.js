@@ -1,13 +1,6 @@
 var $loginForm;
 var $signupForm;
-
-$(function() {
-    $loginForm = $('#login-form');
-    $signupForm = $('#registration-form');
-
-    $loginForm.submit(loginEvent);
-    $signupForm.submit(signUpEvent);
-});
+var socket;
 
 function showError(msg) {
     let $error = $('.error-msg');
@@ -82,7 +75,6 @@ function signUpEvent(e)
             pw: pw
         },
         success: (res) => {
-            console.log(res);
             redirect(res);
         },
         error: (err) => {
@@ -108,7 +100,19 @@ function checkSignUpInputs() {
 
 function redirect(res) {
     let username = `${res.firstName.toLowerCase()}${res.lastName.toLowerCase()}`;
+    let initials = `${res.firstName[0].toUpperCase()}${res.lastName[0].toUpperCase()}`
     localStorage.setItem('userId', res.id);
     localStorage.setItem('username', username);
+    localStorage.setItem('initials', initials);
     window.location.href = `/${username}/boards`;
 }
+
+
+
+$(function() {
+    $loginForm = $('#login-form');
+    $signupForm = $('#registration-form');
+
+    $loginForm.submit(loginEvent);
+    $signupForm.submit(signUpEvent);
+});

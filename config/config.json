@@ -4,7 +4,8 @@
     "password": "project2",
     "database": "project2",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "logging": false
   },
   "test": {
     "username": "project2",
@@ -14,10 +15,6 @@
     "dialect": "postgres"
   },
   "production": {
-    "username": "project2",
-    "password": "project2",
-    "database": "project2",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
+    "use_env_variable": "DATABASE_URL"
   }
 }

@@ -1,6 +1,22 @@
 var cardId;
 var currentLabels;
 
+//********************//
+//   HTML GENERATORS
+//********************//
+
+function generateCommentHTML(comment)
+{
+    let userInitials = comment.firstName[0].toUpperCase()+comment.lastName[0].toUpperCase();
+    return `
+    <div class="activity-item">
+        <div class="activity-item-profile">${userInitials}</div>
+        <div class="activity-item-heading">${comment.firstName} ${comment.lastName}</div>
+        <div class="activity-item-body">${comment.body.replace('\n','<br>')}</div>
+    </div>
+    `;
+}
+
 //******************//
 //   HASH CHANGE
 //******************//
@@ -8,7 +24,7 @@ var currentLabels;
 function handleHashChangeEvent(e) 
 {
     let hash = window.location.hash;
-    
+
     if (hash) {
         $(`${hash}.card`).click();
     } else {
@@ -25,7 +41,7 @@ function displayCardModal(e)
 {
     if (e.target !== e.currentTarget) return;
     // get index of card and list
-    let cindex = $(e.target).index();
+    let cindex = $(e.target).index()-1;
     let lindex = $(e.target).closest('.list').index();
 
     let lid = lists[lindex].id;
@@ -33,7 +49,6 @@ function displayCardModal(e)
     // set cardId
     cardId = cards[lid][cindex].id;
     currentLabels = {};
-    console.log(cardId);
 
     // get card information
     $.ajax({
@@ -41,9 +56,9 @@ function displayCardModal(e)
         method: 'get',
         success: data => {
             // add card info to html
-            console.log("displayCardModal() success: ", data.labels);
+            console.log("displayCardModal() success: ", data);
 
-            // COME BACK TO THIS!!!!!!!!!!
+            // fill in label section
             if (data.labels[0]) {
                 for (let i=0; i<data.labels.length; ++i) {
                     let label = data.labels[i];
@@ -52,6 +67,19 @@ function displayCardModal(e)
                 }
             }
             console.log(currentLabels);
+
+            // fill in new comment section
+            console.log(initials);
+            $('.profile-new-comment').html(initials);
+
+            // fill in activity section
+            if (data.comments) {
+                for (let i=0; i<data.comments.length; ++i) {
+                    let comment = data.comments[i];
+                    let $comment = $(generateCommentHTML(comment));
+                    $('#activity-container').append($comment);
+                }
+            }
 
             // display card
             $('.card-info-modal').addClass('active');
@@ -68,10 +96,13 @@ function hideCardModal(e)
     $('.card-info-modal').removeClass('active');
     $('body').removeClass('modal-active');
     $('.labels-container').html('<div contenteditable="true" id="label-input"></div>');
+    $('#activity-container').empty();
 
     // unset cardId
     cardId = null;
     currentLabels = null;
+
+    window.location.hash = '';
 }
 
 //******************//
@@ -163,11 +194,82 @@ function displayLabel(val, $target)
 }
 
 //******************//
+//    DESCRIPTION
+//******************//
+
+function displayDescriptionInput(e)
+{
+    console.log('displaying description input..');
+    let $description =$(e.target);
+    if ($description.hasClass('editable')) return;
+    let val = $description.text();
+    $description.replaceWith($(`<textarea id="description" class="editable">${val}</textarea>`));
+    $('#description').focus();
+}
+
+function hideDescriptionInput(e)
+{
+    console.log('hiding description input..');
+    let $description =$(e.target);
+    let val = $description.val();
+    $description.replaceWith($(`<div id="description">${val}</div>`));
+}
+
+//******************//
+//   NEW COMMENT
+//******************//
+
+function createComment(e) 
+{
+    e.preventDefault();
+    let comment = $(this).find('#comment-input').val();
+
+    console.log(comment, "by", initials);
+
+    $.ajax({
+        url: `http://localhost:3000/card/${cardId}/comment`,
+        method: 'post',
+        data: {
+            body: comment
+        },
+        success: data => {
+            displayComment(data);
+        },
+        error: err => {
+            console.error(err);
+        }
+    })
+}
+
+function displayComment(data) 
+{
+    comment = data[0][0];
+    user = data[0][1]
+    comment.firstName = user.firstName;
+    comment.lastName  = user.lastName;
+    
+    let $comment = $(generateCommentHTML(comment));
+    $('#activity-container').prepend($comment);
+}
+
+function checkInputLength(e) 
+{
+    let val = $(this).val();
+
+    if (0 >= val.length) {
+        $('#save-comment').prop('disabled', true);
+    } else {
+        $('#save-comment').prop('disabled', false);
+    }
+}
+
+//******************//
 //      MAIN
 //******************//
 
 $(function() 
 {
+
     // show & hide modal
     $('body').on('click', '.card', displayCardModal);
     $('body').on('click', '.modal-background', hideCardModal);
@@ -176,6 +278,12 @@ $(function()
     $('body').on('keydown', '#label-input',labelAutocomplete);
     $('.labels-container').on('click', labelFocus);
     $('.labels-container').on('click', '.del-label-btn', labelRemove);
+
+    $('#description-content').on('click', '#description',displayDescriptionInput);
+    $('#description-content').on('blur', '#description.editable',hideDescriptionInput);
+
+    $('#comment-form').on('submit', createComment);
+    $('#comment-input').on('keyup', checkInputLength);
 
     $(window).on('hashchange', handleHashChangeEvent);
 })

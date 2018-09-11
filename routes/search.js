@@ -19,8 +19,10 @@ router.get('/search', function(req, res, next)
 function searchBoards(req, res, next) 
 {
     // check if user input is valid
-    let userInput = req.query.q;
+    let userInput = req.query.q.replace('-', ' ');
     let userId = req.session.user.id;
+
+    console.log(userInput);
 
     // build raw query
     let boardQuery = `
@@ -54,7 +56,7 @@ function searchBoards(req, res, next)
 function searchCards(boards, req, res, next)
 {
     // check if user input is valid
-    let userInput = req.query.q;
+    let userInput = req.query.q.replace('-',' ');
     let userId = req.session.user.id;
 
     // build raw query

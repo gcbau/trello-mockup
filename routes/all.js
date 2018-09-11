@@ -86,9 +86,9 @@ router.get('/user', function(req,res,next) {
     })
 });
 
-/**
- *  for creating invitations
- */
+/***************************/
+/*  Create Notifications   */
+/***************************/
 router.post('/invite', function(req, res, next) {
     let senderId = req.body.senderId;
     let receiverId = req.body.receiverId;
@@ -195,6 +195,37 @@ function sendInvitation(req, res, next)
         next(err);
     })
 }
+
+
+/***************************/
+/*   Get Notifications     */
+/***************************/
+router.get('/:receiverId/notifications', function(req,res,next) 
+{
+    // build query
+    let query = `
+        SELECT i."senderId" AS "senderId", CONCAT(u."firstName",' ',u."lastName") AS "senderName", t."id" AS "teamId", t."name" AS "teamName", i."createdOn" AS "date"
+        FROM "invitations" i
+        INNER JOIN users u
+                ON i."senderId" = u.id
+        INNER JOIN teams t
+                ON i."teamId" = t.id
+        WHERE i."receiverId" = :receiverId;
+    `;
+
+    // execute query
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.SELECT,
+        replacements: req.params
+    })
+    .then( sqlres => {
+        res.status(200).json(sqlres);
+    })
+    .catch( err => {
+        console.error(err);
+        next(err);
+    })
+});
 
 
 module.exports = router;

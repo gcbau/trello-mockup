@@ -11,14 +11,27 @@ router.get('/card/:id', function(req,res,next)
     console.log(`/card/${req.params.id}`);
     // build raw query
     let query = `
-        SELECT c.id, c.description, json_agg(l.*) "labels"
+        SELECT
+            c.id,                                   -- select card ID
+            c.description,                          -- select card Description
+
+            (SELECT json_agg(l.*) "labels"
         FROM "cards" c
         LEFT JOIN "cardLabels" cl
             ON cl."cardId" = c."id"
         LEFT JOIN "labels" l
             ON l."id" = cl."labelId"
         WHERE c."id" = :id
-        GROUP BY c.id, c.description;
+        GROUP BY c.id) "labels",                       -- select all relevant labels
+
+            (SELECT json_agg( (SELECT x FROM (SELECT co.id, co.body, co."createdOn", co."userId", u."firstName", u."lastName") x ) )
+        FROM (SELECT * FROM "comments" ORDER BY "comments"."createdOn" DESC) co
+        JOIN (SELECT u.id, u."firstName", u."lastName" FROM "users" u) u
+            ON co."userId" = u.id
+        WHERE co."cardId" = :id) "comments"            -- select all relevant comments
+
+        FROM "cards" c
+        WHERE c.id = :id;
     `;
 
     // execute raw query
@@ -170,5 +183,82 @@ router.delete('/card/:cardId/label/:labelId', function(req, res, next)
 
     res.end();
 })
+
+//**************************//
+//    GET CARD COMMENTS
+//**************************//
+
+router.get('/card/:cardId/comment', function (req, res, next) 
+{
+    console.log(req.params);
+
+    // check request
+    let cardId = req.params.cardId;
+
+    // build raw query
+    let query = `
+        SELECT *
+        FROM "comments" c
+        WHERE c."cardId" = :cardId
+        ORDER BY c."createdOn";
+    `;
+
+    // execute query
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.SELECT,
+        replacements: { cardId: cardId }
+    })
+    .then( comments => {
+        res.status(200).json(comments);
+    })
+    .catch( err => {
+        console.error(err);
+        next(err);
+    })
+});
+
+//**************************//
+//      CREATE COMMENT
+//**************************//
+
+router.post('/card/:cardId/comment', function(req, res, next) 
+{
+    console.log(req.body);
+
+    // check request
+    let body = req.body.body;
+    let userId = req.session.user.id;
+    let cardId = req.params.cardId;
+
+    // build raw query
+    let query = `
+        INSERT INTO "comments"
+            ("cardId","userId","createdOn","body")
+        VALUES
+            (:cardId, :userId, NOW(), :body)
+        RETURNING *;
+
+        SELECT u."firstName", u."lastName"
+        FROM "users" u
+        WHERE u."id" = :userId;
+    `;
+
+    // execute raw query
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.INSERT,
+        replacements: {
+            cardId: cardId,
+            userId: userId,
+            body: body
+        }
+    })
+    .then( comment => {
+        res.status(200).json(comment);
+    })
+    .catch( err => {
+        console.error(err);
+        next(err);
+    })
+});
 
 module.exports = router;

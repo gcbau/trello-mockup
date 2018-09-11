@@ -9,12 +9,13 @@ var session = require('client-sessions');
 
 var allRouter   = require('./routes/all');
 
-var loginRouter = require('./routes/login');
-var boardsRouter = require('./routes/board/');
-var listsRouter = require('./routes/list/');
-var cardsRouter = require('./routes/list/card');
+var loginRouter    = require('./routes/login');
+var boardsRouter   = require('./routes/board/');
+var listsRouter    = require('./routes/list/');
+var cardsRouter    = require('./routes/list/card');
 var cardInfoRouter = require('./routes/list/card-info');
-var navbarRouter = require('./routes/search');
+var navbarRouter   = require('./routes/search');
+var teamsRouter    = require('./routes/team');
 
 // create app
 var app = express();
@@ -60,6 +61,7 @@ app.use('/', listsRouter);
 app.use('/', cardsRouter);
 app.use('/', cardInfoRouter);
 app.use('/', navbarRouter);
+app.use('/', teamsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

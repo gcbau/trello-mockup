@@ -14,6 +14,20 @@ function generateBoardItemResult(board) {
     `;
 }
 
+function generateInvitationNotification(res) {
+    return `
+        <div class="notification">
+            <p class="date">${res.date.replace('T',' ').replace(/\..*/,'')}</p>
+            <p class="sender-msg">Sender: <span data-senderId=${res.senderId}><strong>${res.senderName}</strong></span></p>
+            <p class="team-msg">Invited to team: <strong>${res.teamName}</strong></p>
+            <div class="btn-wrapper">
+                <button class="accept-btn" data-teamId=${res.teamId}>Accept</button>
+                <button class="decline-btn">Decline</button>
+            </div>
+        </div>
+    `;
+}
+
 //******************//
 // SIDE BAR DISPLAY
 //******************//
@@ -24,8 +38,29 @@ function displayBoards() {
 function displayProfile() {
     displaySideBar($('.profile-sidebar'));
 }
-function displayNotifications() {
-    displaySideBar($('.notifications-sidebar'));
+
+function displayNotifications() 
+{
+    let $sidebar = $('.notifications-sidebar');
+
+    if ($sidebar.hasClass('active')) {
+        $sidebar.removeClass('active');
+    } else {
+        $sidebar.addClass('active');
+        // fetch all notifications
+        $.ajax({
+            url: `http://localhost:3000/${userId}/notifications`,
+            method: 'get',
+            success: (res) => {
+                console.log(res);
+                let $alert = $(generateInvitationNotification(res[0]));
+                $sidebar.find('#notifications-content').append($alert);
+            },
+            error: (err) => {
+                console.error(err);
+            }
+        });
+    }
 }
 
 function displaySideBar($sidebar) {
@@ -92,7 +127,7 @@ function checkToSearch(e)
 
 function searchQuery(query) 
 {
-    console.log('searching by input');
+    query = query.replace(' ', '-');
     $.ajax({
         url: `http://localhost:3000/search?q=${query}`,
         method: 'GET',

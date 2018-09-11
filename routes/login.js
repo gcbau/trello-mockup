@@ -25,7 +25,11 @@ router.post('/login', function(req, res, next) {
   }
 
   let checkQuery = `SELECT * FROM "users" WHERE email=:email`;
-  db.sequelize.query(checkQuery, { replacements:{email:email} ,type:db.sequelize.QueryTypes.SELECT }).then(sqlResponse => {
+  db.sequelize.query(checkQuery, { 
+    replacements:{email:email},
+    type:db.sequelize.QueryTypes.SELECT 
+  })
+  .then(sqlResponse => {
     if (0 >= sqlResponse.length) {
       next(createError(401));
       return;

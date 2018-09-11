@@ -39,7 +39,6 @@ function getRecentBoards(req, res, next)
         replacements: { uid: uid }
     })
     .then( recentBoards => {
-        console.log(recentBoards);
         getPersonalTeamBoards(recentBoards, req, res, next);
     })
     .catch( err => {
@@ -76,20 +75,22 @@ function getPersonalTeamBoards(recentboards, req, res, next)
         type: db.sequelize.QueryTypes.SELECT
     })
     .then( otherBoards => {
-        renderPage(res, recentboards, otherBoards);
+        renderPage(req, res, recentboards, otherBoards);
     })
     .error( err => {
         next(createError(err));
     });
 }
 
-function renderPage(res, recentBoards, data)
+function renderPage(req, res, recentBoards, data)
 {
     if (0 === data.length) {
         res.render('boards', {
             personalboards: [],
             teams: [],
-            recentBoards: recentBoards
+            allTeams: [],
+            recentBoards: recentBoards,
+            userId: req.session.user.id
         });
     } else {
         let personal = data[data.length-1];
@@ -99,16 +100,12 @@ function renderPage(res, recentBoards, data)
             personal.boards = [];
             teams = data;
         }
-        console.log(' ');
-        console.log(personal);
-        console.log(' ');
-        console.log(teams);
-        console.log(' ');
-        console.log(recentBoards);
         res.render('boards', {
             personalboards: personal.boards,
             teams: teams,
-            recentBoards: recentBoards
+            allTeams: teams,
+            recentBoards: recentBoards,
+            userId: req.session.user.id
         });
     }
 }
@@ -159,9 +156,6 @@ router.post('/team', function(req, res)
 {
     // get request args
     let args = req.body;
-    console.log(' ');
-    console.log("ERIEHWORHQOHRIQWI => ",args);
-    console.log(' ');
 
     let insertQuery = `
         INSERT INTO "teams" 
@@ -178,7 +172,6 @@ router.post('/team', function(req, res)
     })
     .then( sqlResponse => {
         let data = sqlResponse[0][0];
-        console.log('inside /createTeam teams => ', data);
 
         insertQuery = `
             INSERT INTO "teamUsers" ("teamId","userId")
@@ -193,7 +186,6 @@ router.post('/team', function(req, res)
             type: db.sequelize.QueryTypes.INSERT
         })
         .then( sqlResponse2 => {
-            console.log('inside /createTeam team_users => ', sqlResponse2);
             res.status(200).json(data);
         })
         .error();
@@ -201,6 +193,6 @@ router.post('/team', function(req, res)
     .error( err => {
         console.error(err);
     });
-}); 
+});
 
 module.exports = router;
