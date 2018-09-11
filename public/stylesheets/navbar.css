@@ -179,7 +179,7 @@
     display: none;
 }
 
-.notifications-sidebar #notifications-content {
+#notifications-content {
     width: 100%;
     height: 100%;
     background: white;
@@ -188,6 +188,14 @@
     border-radius: 5px;
 
     padding: 0 10px 10px 10px;
+}
+
+#notifications-content .heading {
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid grey;
+    text-align: center;
+    font-size: 18px;
 }
 
 .notification {

@@ -18,8 +18,8 @@ function generateInvitationNotification(res) {
     return `
         <div class="notification">
             <p class="date">${res.date.replace('T',' ').replace(/\..*/,'')}</p>
-            <p class="sender-msg">Sender: <span data-senderId=${res.senderId}><strong>${res.senderName}</strong></span></p>
-            <p class="team-msg">Invited to team: <strong>${res.teamName}</strong></p>
+            <p class="sender-msg">From: <span data-senderId=${res.senderId}><strong>${res.senderName}</strong></span></p>
+            <p class="team-msg">Invited to: <strong>${res.teamName}</strong></p>
             <div class="btn-wrapper">
                 <button class="accept-btn" data-teamId=${res.teamId}>Accept</button>
                 <button class="decline-btn">Decline</button>
@@ -44,6 +44,7 @@ function displayNotifications()
     let $sidebar = $('.notifications-sidebar');
 
     if ($sidebar.hasClass('active')) {
+        $sidebar.find('.notification').remove();
         $sidebar.removeClass('active');
     } else {
         $sidebar.addClass('active');
@@ -53,8 +54,13 @@ function displayNotifications()
             method: 'get',
             success: (res) => {
                 console.log(res);
-                let $alert = $(generateInvitationNotification(res[0]));
-                $sidebar.find('#notifications-content').append($alert);
+
+                let $container = $sidebar.find('#notifications-content');
+
+                for (let i=0; i<res.length; ++i) {
+                    let $alert = $(generateInvitationNotification(res[i]));
+                    $container.append($alert);
+                }
             },
             error: (err) => {
                 console.error(err);
