@@ -13,7 +13,6 @@ html {
     padding: 0;
     margin: 0;
     height: 100%;
-    width: 100%;
 }
 
 body {
@@ -34,7 +33,7 @@ body {
     min-height: 100%;
     background: #f8f9f9;
 
-    padding: 1% 25% 10% 25%;
+    padding: 1% 0 10% 25%;
 }
 
 .team {
