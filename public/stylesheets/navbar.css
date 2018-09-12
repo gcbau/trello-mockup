@@ -140,6 +140,7 @@
 #sideboards-content {
     width: 100%;
     height: auto;
+    max-height: 100%;
     background: white;
 
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
@@ -151,19 +152,19 @@
 }
 
 .team-item {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .team-item .team-heading {
     position: relative;
     height: 35px;
     margin-bottom: 5px;
-    font-size: 18px;
 }
 
 .team-item .team-name {
-    padding-top: 5px;
     color: grey;
+    padding-top: 5px;
+    font-size: 18px!important;
 }
 
 .team-item .expand-btn {
@@ -197,6 +198,7 @@
     background: rgba(64,163,91,.2);
 
     cursor: pointer;
+    display: block;
 }
 
 #sideboards-content .board-icon {

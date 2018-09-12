@@ -37,12 +37,12 @@
     </nav>
 
     <div id="board-content">
+        <!-- Recent Boards -->
         <div id="recently-viewed" class="team">
             <div class="team-heading">
                 <i class="far fa-clock"></i><span class="team-name">Recently Viewed</span>
             </div>
             <div class="team-content">
-                <!-- recent boards ejs -->
                 <% for(let i=0; i<recentBoards.length; ++i) { %>
                     <div id=<%= recentBoards[i].id %> class="board-icon">
                         <a href=<%= '/b/'+recentBoards[i].id+'/'+recentBoards[i].name.replace(/ /g,'-') %> > <%= recentBoards[i].name %></a>
@@ -50,22 +50,21 @@
                 <% } %>
             </div>
         </div>
+        <!-- Personal Boards -->
         <div id="personal" class="team">
             <div class="team-heading">
                 <i class="fas fa-user"></i><span class="team-name">Personal Boards</span>
             </div>
             <div class="team-content">
-                <!-- personal boards ejs -->
                 <% for(let i=0; i<personalboards.length; ++i) { %>
                     <div id=<%= personalboards[i].id %> class="board-icon">
                         <a href=<%= '/b/'+personalboards[i].id+'/'+personalboards[i].name.replace(/ /g,'-') %>><%= personalboards[i].name %></a>
                     </div>
                 <% } %>
-                <!-- add new board -->
                 <button class="board-icon create-new-board-btn">Create New Board</button>
             </div>
         </div>
-        <!-- all other teams ejs -->
+        <!-- All Teams -->
         <% for(let i=0; i<teams.length; ++i) { %>
             <% let team = teams[i] %>
             <% let boards = team.boards %>
@@ -114,102 +113,46 @@
     <!-- board sidebar for navigation -->
     <div class="boards-sidebar">
         <div id="sideboards-content">
+            <!-- Personal Boards -->
             <div class="team-item">
                 <div class="team-heading">
-                    <div class="team-name">teamo</div>
-                    <div class="expand-btn">+</div>
+                    <div class="team-name">Personal Boards</div>
+                    <div class="expand-btn">-</div>
                 </div>
-                <div class="team-boards">
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardo</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardie</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boarda</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardodo</strong></div>
-                    </div>
+                <div class="team-boards active">
+                    <% for(let i=0; i<personalboards.length; ++i) { %>
+                        <% if (20 < personalboards[i].name.length) personalboards[i].name = personalboards[i].name.substring(0,20) + '...'; %>
+                        <a class="board-item" href=<%= '/b/'+personalboards[i].id+'/'+personalboards[i].name.replace(/ /g,'-') %>>
+                            <div class="board-icon"></div>
+                            <div class="board-name"><strong><%= personalboards[i].name %></strong></div>
+                        </a>
+                    <% } %>
                 </div>
             </div>
-            <div class="team-item">
-                <div class="team-heading">
-                    <div class="team-name">teamie</div>
-                    <div class="expand-btn">+</div>
+            <!-- Team Boards -->
+            <% for(let i=0; i<teams.length; ++i) { %>
+                    <% let team = teams[i]; %>
+                    <% let boards = team.boards; %>
+                    <% if (boards[0] == null ) break; %>
+                    <% if (20 < team.teamName.length) team.teamName = team.teamName.substring(0,20) + '...'; %>
+                <div class="team-item">
+                        <div class="team-heading">
+                            <div class="team-name"><%= team.teamName %></div>
+                            <div class="expand-btn">-</div>
+                        </div>
+                        <div class="team-boards active">
+                            <% if (boards[0] != null) { %>
+                                <% for(let j=0; j<boards.length; ++j) { %>
+                                    <% if (20 < boards[j].name.length) boards[j].name = boards[j].name.substring(0,20) + '...'; %>
+                                    <a class="board-item" href=<%= '/b/'+boards[j].id+'/'+boards[j].name.replace(/ /g,'-') %>>
+                                        <div class="board-icon"></div>
+                                        <div class="board-name"><strong><%=boards[j].name %></strong></div>
+                                    </a>
+                                <% } %>
+                            <% } %>
+                        </div>
                 </div>
-                <div class="team-boards">
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardo</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardie</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boarda</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardodo</strong></div>
-                    </div>
-                </div>
-            </div>
-            <div class="team-item">
-                <div class="team-heading">
-                    <div class="team-name">teamo</div>
-                    <div class="expand-btn">+</div>
-                </div>
-                <div class="team-boards">
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardo</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardie</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boarda</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardodo</strong></div>
-                    </div>
-                </div>
-            </div>
-            <div class="team-item">
-                <div class="team-heading">
-                    <div class="team-name">teamie</div>
-                    <div class="expand-btn">+</div>
-                </div>
-                <div class="team-boards">
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardo</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardie</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boarda</strong></div>
-                    </div>
-                    <div class="board-item">
-                        <div class="board-icon"></div>
-                        <div class="board-name"><strong>boardodo</strong></div>
-                    </div>
-                </div>
-            </div>
+            <% } %>
         </div>
     </div>
 
