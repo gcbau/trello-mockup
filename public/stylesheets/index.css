@@ -284,10 +284,17 @@ body {
     margin-top: 20px;
     width: 92px;
     height: 34px;
+
+    border-radius: 5px;
+    border: 1px solid transparent;
+    box-shadow: 0px 0px 1px 0px rgba(0,0,0,0.75);
+
+    cursor: pointer;
 }
 
-
-
+#create-team-btn:hover {
+    background: rgba(0,0,0,.4);
+}
 
 /****************/
 /*  add member  */
