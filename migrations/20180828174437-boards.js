@@ -32,9 +32,9 @@ module.exports = {
         },
         onDelete: 'cascade'
       },
-      name: { type: Sequelize.STRING, allowNull: false },
-      lastViewed: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
-      createdOn: { type: Sequelize.DATE, defaultValue: Sequelize.NOW }
+      name:        { type: Sequelize.STRING, allowNull: false },
+      lastViewed:  { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
+      createdOn:   { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
     })
     .then(() => {
       return queryInterface.addIndex(
@@ -56,6 +56,13 @@ module.exports = {
         ['lastViewed'], {
           indexType: 'BTREE'
       });
+    })
+    .then(() => {
+      let query = '';
+      query += `ALTER TABLE "boards" ADD "nameVectors" tsvector;`;
+      query += `CREATE INDEX name_vector_index ON "boards" USING gin("nameVectors");`
+
+      return queryInterface.sequelize.query(query);
     });
   },
 
