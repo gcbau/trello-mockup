@@ -114,21 +114,23 @@
     <div class="boards-sidebar">
         <div id="sideboards-content">
             <!-- Personal Boards -->
-            <div class="team-item">
-                <div class="team-heading">
-                    <div class="team-name">Personal Boards</div>
-                    <div class="expand-btn">-</div>
+            <% if (0 < personalboards.length) { %>
+                <div class="team-item">
+                    <div class="team-heading">
+                        <div class="team-name">Personal Boards</div>
+                        <div class="expand-btn">-</div>
+                    </div>
+                    <div class="team-boards active">
+                        <% for(let i=0; i<personalboards.length; ++i) { %>
+                            <% if (20 < personalboards[i].name.length) personalboards[i].name = personalboards[i].name.substring(0,20) + '...'; %>
+                            <a class="board-item" href=<%= '/b/'+personalboards[i].id+'/'+personalboards[i].name.replace(/ /g,'-') %>>
+                                <div class="board-icon"></div>
+                                <div class="board-name"><strong><%= personalboards[i].name %></strong></div>
+                            </a>
+                        <% } %>
+                    </div>
                 </div>
-                <div class="team-boards active">
-                    <% for(let i=0; i<personalboards.length; ++i) { %>
-                        <% if (20 < personalboards[i].name.length) personalboards[i].name = personalboards[i].name.substring(0,20) + '...'; %>
-                        <a class="board-item" href=<%= '/b/'+personalboards[i].id+'/'+personalboards[i].name.replace(/ /g,'-') %>>
-                            <div class="board-icon"></div>
-                            <div class="board-name"><strong><%= personalboards[i].name %></strong></div>
-                        </a>
-                    <% } %>
-                </div>
-            </div>
+            <% } %>
             <!-- Team Boards -->
             <% for(let i=0; i<teams.length; ++i) { %>
                     <% let team = teams[i]; %>
