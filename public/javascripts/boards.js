@@ -15,12 +15,18 @@ function generateBoardIcon(teamId, boardId, title)
 
 function generateTeamRow(teamId, title) 
 {
-    return  '<div id="'+teamId+'" class="team">'+
-                '<div class="team-heading"><i class="fas fa-users"></i><span class="team-name">'+title+'</span></div>'+
-                '<div class="team-content">'+
-                    '<button class="board-icon create-new-board-btn">Create New Board</button>'+
-                '</div>'+
-            '</div>';
+    return  `
+        <div id=${teamId} class="team">
+            <div class="team-heading">
+                <i class="fas fa-users"></i>
+                <span class="team-name">${title}</span>
+                <div class="add-member">+ Add Member</div>
+            </div>
+            <div class="team-content">
+                <button class="board-icon create-new-board-btn">Create New Board</button>
+            </div>
+        </div>
+    `;
 }
 
 //******************//
