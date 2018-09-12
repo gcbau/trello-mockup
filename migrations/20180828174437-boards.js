@@ -60,7 +60,7 @@ module.exports = {
     .then(() => {
       let query = '';
       query += `ALTER TABLE "boards" ADD "nameVectors" tsvector;`;
-      query += `CREATE INDEX name_vector_index ON "boards" USING gin("nameVectors");`
+      query += `CREATE INDEX board_name_vector_index ON "boards" USING gin("nameVectors");`
 
       return queryInterface.sequelize.query(query);
     });

@@ -49,6 +49,13 @@ module.exports = {
         ['order'], {
           indexType: 'BTREE'
       });
+    })
+    .then(() => {
+      let queries = ``;
+      queries += `ALTER TABLE "cards" ADD "nameVectors" tsvector; `;
+      queries += `CREATE INDEX name_vector_index ON "cards" USING gin("nameVectors")`;
+
+      return queryInterface.sequelize.query(queries);
     });
   },
 
