@@ -13,6 +13,7 @@ module.exports = {
     return queryInterface.createTable(table, {
       senderId: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
         references: {
           model: 'users',
           key: 'id'
@@ -21,6 +22,7 @@ module.exports = {
       },
       receiverId: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
         references: {
           model: 'users',
           key: 'id'
@@ -29,6 +31,7 @@ module.exports = {
       },
       teamId: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
         references: {
           model: 'teams',
           key: 'id'
