@@ -7,9 +7,13 @@
 //*********************//
 
 function generateBoardItemResult(board) {
+    let boardName = board.name;
+    if (20 < boardName.length) {
+        boardName = boardName.substring(0,20) + '...';
+    }
     return `
         <div class="board-link-container">
-            <a href="/b/${board.id}/${board.name}">${board.name}</a>
+            <a href="/b/${board.id}/${board.name}">${boardName}</a>
         </div>
     `;
 }
@@ -227,13 +231,21 @@ function displayResults(data)
     let $searchResults = $('#search-results');
     $searchResults.empty();
 
+    if (0 >= cards.length && 0 >= boards.length) {
+        $searchResults.append('<p style="padding-left:10px;">No results found.</p>');
+        return;
+    }
+
     if (0 < cards.length) {
         $searchResults.append($('<div id="card-results"><h4>Cards</h4></div>'));
         let $cards = $('#card-results');
         for (let i=0; i<cards.length; ++i) {
             let card = cards[i];
-            console.log(card);
-            $cards.append($(`<a href="/b/${card.boardId}/${card.boardName}#${card.id}">${card.name}</a>`));
+            let cardName = card.name;
+            if (40 < cardName.length) {
+                cardName = cardName.substring(0,40) + '...';
+            }
+            $cards.append($(`<a href="/b/${card.boardId}/${card.boardName}#${card.id}">${cardName}</a>`));
         }
     }
     if (0 < boards.length) {

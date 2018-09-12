@@ -41,7 +41,7 @@ function displayCardModal(e)
 {
     if (e.target !== e.currentTarget) return;
     // get index of card and list
-    let cindex = $(e.target).index()-1;
+    let cindex = $(e.target).index();
     let lindex = $(e.target).closest('.list').index();
 
     let lid = lists[lindex].id;

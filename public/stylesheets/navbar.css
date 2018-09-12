@@ -347,6 +347,9 @@
     top: 40px;
     left: 0;
     width: 125%;
+
+    max-height: 500px;
+    overflow: scroll;
 }
 
 .search-active {
