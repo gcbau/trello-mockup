@@ -5,8 +5,13 @@ $(function() {
         }
     });
 
-    socket.on('invitation', (msg) => {
-        console.log(msg);
+    socket.on('invitation', (sqlres) => {
+        res = sqlres[0][0];
+        res.date = res.createdOn;
+        console.log(res);
+        let inv = generateInvitationNotification(res);
+        console.log(inv);
+        $('#notifications-content').find('.heading').after(inv);
     })
 
     socket.on('disconnect', () => {

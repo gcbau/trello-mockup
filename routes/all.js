@@ -181,19 +181,48 @@ function sendInvitation(req, res, next)
         replacements: req.body
     })
     .then( sqlres => {
-        // send message to receiver socket
-        let targSock = socket.sockets()[req.body.receiverId];
-        if (targSock) {
-            targSock.emit('invitation', `${senderName} has invited you to team ${teamId}`);
-        }
-
-        // send response to sender
-        res.status(200).json(sqlres);
+        getInvitationNames(sqlres, req, res, next)
     })
     .catch( err => {
         console.error(err);
         next(err);
     })
+}
+
+function getInvitationNames(inv, req, res, next)
+{
+    // build query
+    let query = `
+        SELECT CONCAT(u."firstName",' ',u."lastName") AS "senderName", t."name" AS "teamName"
+        FROM "invitations" i
+        INNER JOIN users u
+                ON i."senderId" = u.id
+        INNER JOIN teams t
+                ON i."teamId" = t.id
+        WHERE i."receiverId" = :receiverId;
+    `;
+
+    // execute query
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.SELECT,
+        replacements: inv[0][0]
+    })
+    .then( sqlres => {
+        inv[0][0].senderName = sqlres[0].senderName;
+        inv[0][0].teamName = sqlres[0].teamName;
+
+        let sock = socket.sockets()[inv[0][0].receiverId];
+        if (sock) {
+            sock.emit('invitation', inv);
+        }
+
+        res.status(200).json(inv);
+    })
+    .catch( err => {
+        console.error(err);
+        next(err);
+    })
+
 }
 
 
