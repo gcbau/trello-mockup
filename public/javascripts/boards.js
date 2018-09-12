@@ -157,16 +157,17 @@ function createNewTeam(e)
     })
     .done( data => {
         console.log(data);
-        displayTeam(data.id, data.name, $('#create-new-team-btn'));
+        displayNewTeam(data.id, data.name, $('#create-new-team-btn'));
     })
     .fail( err => {
         console.err(err);
     });
 }
 
-function displayTeam(teamId, title, $target)
+function displayNewTeam(teamId, title, $target)
 {
     let stringHTML = generateTeamRow(teamId, title);
+    console.log($target);
     $(stringHTML).insertBefore($target);
     hideTeamForm();
 }
