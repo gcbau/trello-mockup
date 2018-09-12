@@ -182,9 +182,7 @@ function setupCards()
             for (let j=0; j<tempCards.length; ++j) {
                 let card = tempCards[j];
                 let $card = $(generateCardHTML(card["id"],card["name"]));
-                // $list.append($card);
-                $card.insertBefore($foot);
-                // $lfoot.append($card);
+                $list.append($card);
             }
         }
         setupCardsSortables();
@@ -227,17 +225,16 @@ function generateListHTML(listId, title)
         <div id="${listId}" class="list">
             <div class="list-wrapper">
                 <h2 class="colHeading">${title}</h2>
-                <ul class="card-container">
-                    <li class="list-foot addRowItem">
-                        <span id="showCardForm" class="active">
-                            + Add a card
-                        </span>
-                        <span id="cardForm">
-                            <button class="addNewCard-btn">Add Card</button>
-                            <button class="closeNewCard-btn">X</button>
-                        </span>
-                    </li>
-                </ul>
+                <div class="card-container"></div>
+                <div class="list-foot addRowItem">
+                    <span id="showCardForm" class="active">
+                        + Add a card
+                    </span>
+                    <span id="cardForm">
+                        <button class="addNewCard-btn">Add Card</button>
+                        <button class="closeNewCard-btn">X</button>
+                    </span>
+                </div>
             </div>
         </div>
     `;
@@ -295,30 +292,43 @@ function displayListError(err)
 function newListRow() 
 {
     return `
-        <li class="card textarea-active">
+        <div class="card textarea-active">
             <textarea class="newCardInput"></textarea>  
-        </li>
+        </div>
     `;
 }
 
 function generateCardHTML(cid, cname) 
 {
     return `
-        <li id=${cid} class="card">${cname}</li>
+        <div id=${cid} class="card">${cname}</div>
     `;
 }
 
 function showCardForm(e) 
 {
+    // hide any other card forms
+    hideCardForm();
     // add new list row && change list foot
     let $row = $(newListRow());
     let $foot = $(e.target).closest('.list-foot');
-    // let $cardContainer = $(e.target).closest('.card-container');
-    // $cardContainer.append($row);
+    let $cardContainer = $foot.siblings('.card-container');
+    $cardContainer.append($row);
+    $row.find('.newCardInput').focus();
     
     $foot.find('#showCardForm').removeClass('active');
     $foot.find('#cardForm').addClass('active');
     $('.newCardInput').trigger('input');
+}
+
+function hideCardForm()
+{
+    let $card = $('.textarea-active');
+    let $foot = $('.list-foot');
+
+    $card.remove();
+    $foot.find('#showCardForm').addClass('active');
+    $foot.find('#cardForm').removeClass('active');
 }
 
 function resizeCardForm() 
@@ -331,12 +341,22 @@ function resizeCardForm()
 //    CREATE CARD
 //******************//
 
+function checkCardInputKey(e)
+{
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        let $cardContainer = $(e.target).closest('.card-container');
+        $cardContainer.siblings('.list-foot').find('.addNewCard-btn').trigger('click');
+    }
+}
+
 function createCard(e) 
 {
     let $btn = $(e.target);
-    let $card = $btn.closest('.card-container').find('textarea');
-    console.log($card);
+    let $foot = $btn.closest('.list-foot');
+    let $card = $foot.siblings('.card-container').find('.newCardInput');
 
+    console.log($foot);
     let cardname = $card.val().trim();
     if (cardname === '') return;
 
@@ -409,5 +429,7 @@ $(function() {
 
     $('body').on('click', '#showCardForm', showCardForm);
     $('body').on('input', '.newCardInput', resizeCardForm); 
+    $('body').on('keydown', '.newCardInput', checkCardInputKey);
+    $('body').on('click', '.closeNewCard-btn', hideCardForm);
     $('body').on('click', '.addNewCard-btn', createCard);
 });
