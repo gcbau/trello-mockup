@@ -53,19 +53,32 @@ function getPersonalTeamBoards(recentboards, req, res, next)
     let uid  = user.id;
 
     // build query to get personal & team boards
+
+        // SELECT t.id "teamId", t.name "teamName", "tb"."boards"
+        // FROM (SELECT t.id, tu."joinedAt", json_agg(DISTINCT b.*) AS "boards"
+        //     FROM "teams" t
+        //     FULL OUTER JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
+        //         ON t."id" = "b"."teamId"
+        //     LEFT JOIN "teamUsers" tu
+        //         ON "tu"."teamId" = "t"."id"
+        //     WHERE "b"."ownerId" = :id OR "tu"."userId" = :id
+        //     GROUP BY t.id, tu."joinedAt") tb
+        // LEFT JOIN "teams" t
+        //     ON "t"."id" = "tb"."id"
+        // ORDER BY tb."joinedAt" DESC
+
     let query = `
-        SELECT t.id "teamId", t.name "teamName", "tb"."boards"
-        FROM (SELECT t.id, tu."joinedAt", json_agg(DISTINCT b.*) AS "boards"
-            FROM "teams" t
-            FULL OUTER JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
-                ON t."id" = "b"."teamId"
-            LEFT JOIN "teamUsers" tu
-                ON "tu"."teamId" = "t"."id"
-            WHERE "b"."ownerId" = :id OR "tu"."userId" = :id
-            GROUP BY t.id, tu."joinedAt") tb
-        LEFT JOIN "teams" t
-            ON "t"."id" = "tb"."id"
-        ORDER BY tb."joinedAt" DESC
+        SELECT t."teamId", t.name "teamName", json_agg(DISTINCT b.*) AS "boards"
+        FROM
+            (SELECT DISTINCT ON (tu."joinedAt") tu."teamId", t."name", tu."joinedAt"
+            FROM "teamUsers" tu
+            INNER JOIN teams t
+                    ON tu."teamId" = t.id
+            WHERE tu."userId" = :id) t
+        LEFT JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
+            ON b."teamId" = t."teamId"
+        GROUP BY t."teamId", t.name, t."joinedAt"
+        ORDER BY t."joinedAt" DESC;
     `;
 
     // execute query
