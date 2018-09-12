@@ -81,4 +81,68 @@
             </ul>
         </div>
     </div>
+
+
+    <!-- board sidebar for navigation -->
+    <div class="boards-sidebar">
+        <div id="sideboards-content">
+            <!-- Personal Boards -->
+            <% if (0 < personalboards.length) { %>
+                <div class="team-item">
+                    <div class="team-heading">
+                        <div class="team-name">Personal Boards</div>
+                        <div class="expand-btn">-</div>
+                    </div>
+                    <div class="team-boards active">
+                        <% for(let i=0; i<personalboards.length; ++i) { %>
+                            <% if (20 < personalboards[i].name.length) personalboards[i].name = personalboards[i].name.substring(0,20) + '...'; %>
+                            <a class="board-item" href=<%= '/b/'+personalboards[i].id+'/'+personalboards[i].name.replace(/ /g,'-') %>>
+                                <div class="board-icon"></div>
+                                <div class="board-name"><strong><%= personalboards[i].name %></strong></div>
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+            <% } %>
+            <!-- Team Boards -->
+            <% for(let i=0; i<teams.length; ++i) { %>
+                    <% let team = teams[i]; %>
+                    <% let boards = team.boards; %>
+                    <% if (boards[0] == null ) continue; %>
+                    <% if (20 < team.teamName.length) team.teamName = team.teamName.substring(0,20) + '...'; %>
+                <div class="team-item">
+                        <div class="team-heading">
+                            <div class="team-name"><%= team.teamName %></div>
+                            <div class="expand-btn">-</div>
+                        </div>
+                        <div class="team-boards active">
+                            <% if (boards[0] != null) { %>
+                                <% for(let j=0; j<boards.length; ++j) { %>
+                                    <% if (20 < boards[j].name.length) boards[j].name = boards[j].name.substring(0,20) + '...'; %>
+                                    <a class="board-item" href=<%= '/b/'+boards[j].id+'/'+boards[j].name.replace(/ /g,'-') %>>
+                                        <div class="board-icon"></div>
+                                        <div class="board-name"><strong><%=boards[j].name %></strong></div>
+                                    </a>
+                                <% } %>
+                            <% } %>
+                        </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- profile sidebar for navigation -->
+    <div class="profile-sidebar">
+        <div id="profile-content">
+            <div class="profile-heading">First Last (FL)</div>
+            <div class="log-out">Log Out</div>
+        </div>
+    </div>
+
+    <!-- notifications sidebar for navigation -->
+    <div class="notifications-sidebar">
+        <div id="notifications-content">
+            <div class="heading">Notifications</div>
+        </div>
+    </div>
 </body>

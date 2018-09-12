@@ -2,7 +2,8 @@ var express = require('express');
 var router = express.Router();
 var db = require('../../models/index')
 
-router.get('/b/:bid/:bname', function(req, res) {
+router.get('/b/:bid/:bname', function(req, res, next) 
+{
     console.log(' ');
     console.log(req.params);
     console.log(' ');
@@ -20,14 +21,95 @@ router.get('/b/:bid/:bname', function(req, res) {
         replacements: req.params
     })
     .then( sqlRes => {
+        getPersonalTeamBoards(req,res,next)
         // render list view
-        res.render('lists');
+        // res.render('lists');
     })
     .catch( err => {
         console.error(err);
         next(err);
     })
 });
+
+
+function getPersonalTeamBoards(req, res, next)
+{
+    let user = req.session.user;
+    let uid  = user.id;
+
+    // build query to get personal & team boards
+    let query = `
+        SELECT t.id "teamId", t.name "teamName", "tb"."boards"
+        FROM (SELECT t.id, json_agg(DISTINCT b.*) AS "boards"
+            FROM "teams" t
+            FULL OUTER JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
+                ON t."id" = "b"."teamId"
+            LEFT JOIN "teamUsers" tu
+                ON "tu"."teamId" = "t"."id"
+            WHERE "b"."ownerId" = :id OR "tu"."userId" = :id
+            GROUP BY t.id) tb
+        LEFT JOIN "teams" t
+            ON "t"."id" = "tb"."id"
+    `;
+
+    // execute query
+    db.sequelize.query(query, {
+        replacements: {
+            id: uid
+        },
+        type: db.sequelize.QueryTypes.SELECT
+    })
+    .then( otherBoards => {
+        renderPage(req, res, otherBoards);
+    })
+    .error( err => {
+        next(createError(err));
+    });
+}
+
+function renderPage(req, res, data)
+{
+    if (0 === data.length) {
+        res.render('lists', {
+            personalboards: [],
+            teams: [],
+            allTeams: [],
+            userId: req.session.user.id
+        });
+    } else {
+        console.log(data);
+        let personal = data[data.length-1];
+        let teams = data.slice(0,data.length-1);
+
+        if (personal.teamId) {
+            res.render('lists', {
+                personalboards: [],
+                teams: data,
+                allTeams: data,
+                userId: req.session.user.id
+            });
+            return;
+        } 
+
+        res.render('lists', {
+            personalboards: personal.boards,
+            teams: teams,
+            allTeams: teams,
+            userId: req.session.user.id
+        });
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 
 router.get('/team', function(req,res) {
     console.log(' ');
