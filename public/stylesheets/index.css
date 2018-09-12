@@ -107,6 +107,9 @@ body {
 .board-icon:hover {
     background: #2c7340;
 }
+.create-new-board-btn:hover {
+    background: rgba(0,0,0,0.6);
+}
 .board-icon:nth-child(n+2) {
     margin-left: 22.5px;
 }
