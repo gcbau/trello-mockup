@@ -141,6 +141,8 @@ function updateAfterAccept($btn, res)
     let $alert = $btn.closest('.notification');
 
     $newTeamBtn = $('#create-new-team-btn');
+    $personal = $('#personal');
+
     if (!$newTeamBtn[0]) {
         console.log("we're not in the board's page");
         $alert.remove();
@@ -148,7 +150,8 @@ function updateAfterAccept($btn, res)
     } 
 
     let $newTeam = $(generateTeamRow(res[0].teamId, res[0].teamName));
-    $newTeam.insertBefore($newTeamBtn);
+    // $newTeam.insertBefore($newTeamBtn);
+    $personal.after($newTeam);
     $alert.remove();
 }
 

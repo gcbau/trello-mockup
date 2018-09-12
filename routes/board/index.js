@@ -55,16 +55,17 @@ function getPersonalTeamBoards(recentboards, req, res, next)
     // build query to get personal & team boards
     let query = `
         SELECT t.id "teamId", t.name "teamName", "tb"."boards"
-        FROM (SELECT t.id, json_agg(DISTINCT b.*) AS "boards"
+        FROM (SELECT t.id, tu."joinedAt", json_agg(DISTINCT b.*) AS "boards"
             FROM "teams" t
             FULL OUTER JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
                 ON t."id" = "b"."teamId"
             LEFT JOIN "teamUsers" tu
                 ON "tu"."teamId" = "t"."id"
             WHERE "b"."ownerId" = :id OR "tu"."userId" = :id
-            GROUP BY t.id) tb
+            GROUP BY t.id, tu."joinedAt") tb
         LEFT JOIN "teams" t
             ON "t"."id" = "tb"."id"
+        ORDER BY tb."joinedAt" DESC
     `;
 
     // execute query
@@ -94,8 +95,8 @@ function renderPage(req, res, recentBoards, data)
         });
     } else {
         console.log(data);
-        let personal = data[data.length-1];
-        let teams = data.slice(0,data.length-1);
+        let personal = data[0];
+        let teams = data.slice(1, data.length);
 
         if (personal.teamId) {
             res.render('boards', {
@@ -167,9 +168,9 @@ router.post('/team', function(req, res)
 
     let insertQuery = `
         INSERT INTO "teams" 
-            ("name", "ownerId", "description") 
+            ("name", "ownerId", "description", "createdOn") 
         VALUES 
-            (:name, :ownerId, :description) 
+            (:name, :ownerId, :description, NOW()) 
         RETURNING * ;
     `;
     
@@ -182,8 +183,8 @@ router.post('/team', function(req, res)
         let data = sqlResponse[0][0];
 
         insertQuery = `
-            INSERT INTO "teamUsers" ("teamId","userId")
-            VALUES (:teamId, :userId)`;
+            INSERT INTO "teamUsers" ("teamId","userId","joinedAt")
+            VALUES (:teamId, :userId, NOW())`;
 
         // insert into teamUsers second
         db.sequelize.query(insertQuery, {

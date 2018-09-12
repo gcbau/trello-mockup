@@ -173,8 +173,9 @@ function createNewTeam(e)
 function displayNewTeam(teamId, title, $target)
 {
     let stringHTML = generateTeamRow(teamId, title);
-    console.log($target);
-    $(stringHTML).insertBefore($target);
+    // console.log($target);
+    // $(stringHTML).insertBefore($target);
+    $('#personal').after(stringHTML);
     hideTeamForm();
 }
 

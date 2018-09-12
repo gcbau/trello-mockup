@@ -241,9 +241,9 @@ function addMemberToTeam(req,res,next)
     // build query
     let query = `
         INSERT INTO "teamUsers"
-            ("teamId", "userId")
+            ("teamId", "userId","joinedAt")
         VALUES
-            (:teamId, :receiverId)
+            (:teamId, :receiverId, NOW())
         RETURNING * ;
     `;
 

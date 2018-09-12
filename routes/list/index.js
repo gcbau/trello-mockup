@@ -78,8 +78,8 @@ function renderPage(req, res, data)
         });
     } else {
         console.log(data);
-        let personal = data[data.length-1];
-        let teams = data.slice(0,data.length-1);
+        let personal = data[0];
+        let teams = data.slice(1, data.length);
 
         if (personal.teamId) {
             res.render('lists', {

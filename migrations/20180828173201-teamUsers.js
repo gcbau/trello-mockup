@@ -28,7 +28,18 @@ module.exports = {
           key: 'id'
         },
         onDelete: 'cascade'
+      },
+      joinedAt: {
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
       }
+    })
+    .then(() => {
+      return queryInterface.addIndex(
+        table,
+        ['joinedAt'], {
+          indexType: 'BTREE'
+      });
     });
   },
 
