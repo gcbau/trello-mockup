@@ -70,12 +70,13 @@ function getPersonalTeamBoards(req, res, next)
 
 function renderPage(req, res, data)
 {
+    let initials = req.session.user.firstName[0].toUpperCase() + req.session.user.lastName[0].toUpperCase();
     if (0 === data.length) {
         res.render('lists', {
             personalboards: [],
             teams: [],
-            allTeams: [],
-            userId: req.session.user.id
+            userId: req.session.user.id,
+            initials: initials
         });
     } else {
         let personal = data[0];
@@ -85,8 +86,8 @@ function renderPage(req, res, data)
             res.render('lists', {
                 personalboards: [],
                 teams: data,
-                allTeams: data,
-                userId: req.session.user.id
+                userId: req.session.user.id,
+                initials: initials
             });
             return;
         } 
@@ -94,8 +95,8 @@ function renderPage(req, res, data)
         res.render('lists', {
             personalboards: personal.boards,
             teams: teams,
-            allTeams: teams,
-            userId: req.session.user.id
+            userId: req.session.user.id,
+            initials: initials
         });
     }
 }
