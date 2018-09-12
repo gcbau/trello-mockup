@@ -81,10 +81,6 @@ function renderPage(req, res, data)
         let personal = data[0];
         let teams = data.slice(1, data.length);
 
-        console.log('RENDERING lists PAGE');
-        console.log(personal);
-        console.log(teams);
-
         if (personal.teamId) {
             res.render('lists', {
                 personalboards: [],
