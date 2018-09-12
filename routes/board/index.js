@@ -141,18 +141,18 @@ router.post('/board', function(req, res)
     // setup
     let insertQuery = `
         INSERT INTO "boards" 
-            ("name", "ownerId", "lastViewed", "createdOn") 
+            ("name", "ownerId", "lastViewed", "createdOn", "nameVectors") 
         VALUES 
-            (:name , :ownerId , NOW(), NOW()) 
+            (:name , :ownerId , NOW(), NOW(), (to_tsvector(:name))) 
         RETURNING * ;
     `;
 
     if (req.body.teamId) {
         insertQuery = `
             INSERT INTO "boards" 
-                ("name", "ownerId", "teamId", "lastViewed", "createdOn") 
+                ("name", "ownerId", "teamId", "lastViewed", "createdOn", "nameVectors") 
             VALUES 
-                (:name, :ownerId, :teamId, NOW(), NOW()) 
+                (:name, :ownerId, :teamId, NOW(), NOW(), (to_tsvector(:name))) 
             RETURNING * ;
         `;
     }
