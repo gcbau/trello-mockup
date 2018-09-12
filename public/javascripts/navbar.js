@@ -15,6 +15,7 @@ function generateBoardItemResult(board) {
 }
 
 function generateInvitationNotification(res) {
+    console.log(res);
     return `
         <div class="notification">
             <p class="date">${res.date.replace('T',' ').replace(/\..*/,'')}</p>
