@@ -135,7 +135,7 @@
             <% for(let i=0; i<teams.length; ++i) { %>
                     <% let team = teams[i]; %>
                     <% let boards = team.boards; %>
-                    <% if (boards[0] == null ) break; %>
+                    <% if (boards[0] == null ) continue; %>
                     <% if (20 < team.teamName.length) team.teamName = team.teamName.substring(0,20) + '...'; %>
                 <div class="team-item">
                         <div class="team-heading">
