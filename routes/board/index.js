@@ -67,18 +67,37 @@ function getPersonalTeamBoards(recentboards, req, res, next)
         //     ON "t"."id" = "tb"."id"
         // ORDER BY tb."joinedAt" DESC
 
+        // SELECT t."teamId", t.name "teamName", json_agg(DISTINCT b.*) AS "boards"
+        // FROM
+        //     (SELECT DISTINCT ON (tu."joinedAt") tu."teamId", t."name", tu."joinedAt"
+        //     FROM "teamUsers" tu
+        //     INNER JOIN teams t
+        //             ON tu."teamId" = t.id
+        //     WHERE tu."userId" = :id) t
+        // LEFT JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
+        //     ON b."teamId" = t."teamId"
+        // GROUP BY t."teamId", t.name, t."joinedAt"
+        // ORDER BY t."joinedAt" DESC;
+        
+
     let query = `
-        SELECT t."teamId", t.name "teamName", json_agg(DISTINCT b.*) AS "boards"
-        FROM
-            (SELECT DISTINCT ON (tu."joinedAt") tu."teamId", t."name", tu."joinedAt"
-            FROM "teamUsers" tu
-            INNER JOIN teams t
-                    ON tu."teamId" = t.id
-            WHERE tu."userId" = :id) t
-        LEFT JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
-            ON b."teamId" = t."teamId"
-        GROUP BY t."teamId", t.name, t."joinedAt"
-        ORDER BY t."joinedAt" DESC;
+        SELECT t.id "teamId", t.name "teamName", json_agg(DISTINCT b.*) "boards"
+        FROM (
+            SELECT *
+            FROM "boards" b
+            ORDER BY b."createdOn" DESC
+            ) AS b
+        
+        FULL OUTER JOIN (
+                SELECT t."name", t."id", tu."userId", tu."joinedAt"
+                FROM "teamUsers" tu
+                INNER JOIN "teams" t ON tu."teamId" = t.id
+                ) AS t
+            ON b."teamId" = t."id"
+        
+        WHERE b."ownerId" = :id OR t."userId" = :id
+        GROUP BY t.id, t.name, t."joinedAt"
+        ORDER BY t."joinedAt" DESC
     `;
 
     // execute query
@@ -111,6 +130,8 @@ function renderPage(req, res, recentBoards, data)
         console.log(data);
         let personal = data[0];
         let teams = data.slice(1, data.length);
+        // let personal = data[0];
+        // let teams = data.slice(1, data.length);
 
         if (personal.teamId) {
             res.render('boards', {
