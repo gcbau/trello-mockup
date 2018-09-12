@@ -81,23 +81,28 @@ function getPersonalTeamBoards(recentboards, req, res, next)
         
 
     let query = `
-        SELECT t.id "teamId", t.name "teamName", json_agg(DISTINCT b.*) "boards"
-        FROM (
-            SELECT *
-            FROM "boards" b
-            ORDER BY b."createdOn" DESC
-            ) AS b
-        
-        FULL OUTER JOIN (
-                SELECT t."name", t."id", tu."userId", tu."joinedAt"
-                FROM "teamUsers" tu
-                INNER JOIN "teams" t ON tu."teamId" = t.id
-                ) AS t
-            ON b."teamId" = t."id"
-        
-        WHERE b."ownerId" = :id OR t."userId" = :id
-        GROUP BY t.id, t.name, t."joinedAt"
-        ORDER BY t."joinedAt" DESC
+    ( -- SELECT ALL BOARDS WITH NO TEAMID FIRST
+        SELECT NULL "teamId", NULL "teamName", json_agg(b.*) "boards"
+        FROM "boards" AS b
+        WHERE b."teamId" ISNULL AND b."ownerId" = :id
+    )
+    
+    UNION ALL
+    
+    ( -- SELECT ALL BOARDS WITH TEAMID SECOND
+    SELECT t."teamId", t."teamName", json_agg(b.*) AS "boards"
+    FROM (
+            SELECT tu."teamId", t."name" "teamName", tu."joinedAt"
+            FROM "teamUsers" AS tu
+            INNER JOIN "teams" AS t
+                    ON tu."teamId" = t."id"
+            WHERE tu."userId" = :id
+    ) AS t
+    LEFT JOIN "boards" b
+        ON b."teamId" = t."teamId"
+    GROUP BY t."teamId", t."teamName", t."joinedAt"
+    ORDER BY t."joinedAt" DESC
+    );
     `;
 
     // execute query
