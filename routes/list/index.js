@@ -40,16 +40,17 @@ function getPersonalTeamBoards(req, res, next)
     // build query to get personal & team boards
     let query = `
         SELECT t.id "teamId", t.name "teamName", "tb"."boards"
-        FROM (SELECT t.id, json_agg(DISTINCT b.*) AS "boards"
+        FROM (SELECT t.id, tu."joinedAt", json_agg(DISTINCT b.*) AS "boards"
             FROM "teams" t
             FULL OUTER JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
                 ON t."id" = "b"."teamId"
             LEFT JOIN "teamUsers" tu
                 ON "tu"."teamId" = "t"."id"
             WHERE "b"."ownerId" = :id OR "tu"."userId" = :id
-            GROUP BY t.id) tb
+            GROUP BY t.id, tu."joinedAt") tb
         LEFT JOIN "teams" t
             ON "t"."id" = "tb"."id"
+        ORDER BY tb."joinedAt" DESC
     `;
 
     // execute query
@@ -77,9 +78,12 @@ function renderPage(req, res, data)
             userId: req.session.user.id
         });
     } else {
-        console.log(data);
         let personal = data[0];
         let teams = data.slice(1, data.length);
+
+        console.log('RENDERING lists PAGE');
+        console.log(personal);
+        console.log(teams);
 
         if (personal.teamId) {
             res.render('lists', {
