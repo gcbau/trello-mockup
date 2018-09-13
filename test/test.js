@@ -9,7 +9,6 @@ chai.use(chaiHttp);
 /**************/
 /*   HELPER   */
 /**************/
-
 var agent = chai.request.agent(app);
 function login()
 {
@@ -24,7 +23,6 @@ function login()
 /**************/
 /*   LOGIN    */
 /**************/
-
 describe('Login Page', function()
 {
     //************//
@@ -223,10 +221,16 @@ describe('Login Page', function()
             });
         });
     });
+});
 
-    //***************************//
-    //   boards: team creation
-    //***************************//
+/**************/
+/*   BOARDS   */
+/**************/
+describe('boards page', function()
+{
+    //*******************//
+    //   team creation
+    //*******************//
     describe('team creation', function()
     {
         it('should fail when team name field is missing', function(done)
@@ -351,14 +355,214 @@ describe('Login Page', function()
         });
     });
 
-    //***************************//
-    //   boards: board creation
-    //***************************//
+    //*********************//
+    //   board creation
+    //*********************//
     describe('board creation', function()
     {
-        it('should fail', function(done)
+        it('should fail when board name field is missing', function(done)
         {
-            done();
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/board')
+                            .send({})
+                            .then(function(res2) {
+                                expect(res2).to.have.status(401);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
+
+        it('should fail when userId field is missing', function(done)
+        {
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/board')
+                            .send({
+                                name: 'bobboard 1'
+                            })
+                            .then(function(res2) {
+                                expect(res2).to.have.status(500);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
+
+        it('should fail when userId does not exist', function(done)
+        {
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/board')
+                            .send({
+                                name: 'bobboard 1',
+                                ownerId: 2
+                            })
+                            .then(function(res2) {
+                                expect(res2).to.have.status(400);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
+
+        it('should fail when teamId is a string', function(done)
+        {
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/board')
+                            .send({
+                                name: 'bobboard 1',
+                                ownerId: 2,
+                                teamId: 'fefwefewf'
+                            })
+                            .then(function(res2) {
+                                expect(res2).to.have.status(400);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
+
+        it('should fail when teamId does not exist', function(done)
+        {
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/board')
+                            .send({
+                                name: 'bobboard 1',
+                                ownerId: 2,
+                                teamId: 1000
+                            })
+                            .then(function(res2) {
+                                expect(res2).to.have.status(400);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
+
+        it('should succeed when all fields are correct and team Id is not provided', function(done)
+        {
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/board')
+                            .send({
+                                name: 'bobboard 1',
+                                ownerId: 1
+                            })
+                            .then(function(res2) {
+                                expect(res2).to.have.status(200);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
+
+        it('should succeed when all fields are correct and team Id is provided', function(done)
+        {
+            // login first
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                // create team second
+                agent
+                    .post('/bobbobster/boards/team')
+                    .send({
+                        name: 'boblist 1',
+                        ownerId: 1
+                    })
+                    .then(function(res2) {
+                        expect(res2).to.have.status(200);
+
+                        // create a board in that team third
+                        agent
+                        .post('/bobbobster/boards/board')
+                        .send({
+                            name: 'bobboard 1',
+                            ownerId: 1,
+                            teamId: res2.body.id // using response2's team id
+                        })
+                        .then(function(res3) {
+                            expect(res3).to.have.status(200);
+                            done();
+                        })
+                        .catch(function(err) {
+                            done(err);
+                        });
+
+                    })
+                    .catch(function(err) {
+                        done(err);
+                    })
+            })
+            .catch(function(err){
+                done(err);
+            });
         });
     });
+});
+
+/**************/
+/*   LISTS    */
+/**************/
+describe('lists', function()
+{
+    describe('card creation', function()
+    {
+        it('should fail ', function(done)
+        {
+            done();
+        })
+    })
 });

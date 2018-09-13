@@ -5,14 +5,17 @@ var db = require('../../models/index');
 var status = require('http-status');
 var createError = require('http-errors');
 
+//**********************//
+//*  FOR BACK BUTTON   *//
+//**********************//
 router.use(function(req, res, next) {
     res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
     next();
 });
 
-/**
- *  Render initial page
- */
+//**********************//
+//*   RENDER PAGE      *//
+//**********************//
 router.get('/', function(req, res, next) 
 {
     getRecentBoards(req, res, next);
@@ -135,12 +138,25 @@ function renderPage(req, res, recentBoards, data)
     }
 }
 
-/**
- *  create a board
- */
-router.post('/board', function(req, res) 
+//**********************//
+//*   CREATE A BOARD   *//
+//**********************//
+router.post('/board', function(req, res, next) 
 {
-    // setup
+    // check request values
+    let name    = req.body.name;
+    let ownerId = req.body.ownerId;
+
+    if (!name || name === '') {
+        next(createError(401, "board name field is missing"));
+        return;
+    }
+    if (!ownerId || ownerId === '') {
+        next(createError(500, "user ID is missing"));
+        return;
+    }
+
+    // build insert query
     let insertQuery = `
         INSERT INTO "boards" 
             ("name", "ownerId", "lastViewed", "createdOn", "nameVectors") 
@@ -150,6 +166,10 @@ router.post('/board', function(req, res)
     `;
 
     if (req.body.teamId) {
+        if (typeof req.body.teamId === 'string') {
+            next(createError(400, 'teamId should never be a string'));
+        }
+
         insertQuery = `
             INSERT INTO "boards" 
                 ("name", "ownerId", "teamId", "lastViewed", "createdOn", "nameVectors") 
@@ -159,7 +179,7 @@ router.post('/board', function(req, res)
         `;
     }
 
-    // execute raw query
+    // execute insert query into "boards"
     db.sequelize.query(insertQuery, { 
         replacements: req.body, 
         type: db.sequelize.QueryTypes.INSERT 
@@ -170,13 +190,23 @@ router.post('/board', function(req, res)
         res.status(200).json(data);
     })
     .catch( err => {
-        next(err);
+        let error = err;
+        switch(err.name) {
+            case 'SequelizeForeignKeyConstraintError': {
+                error = createError(400, 'trying to add board by a user that does not exist');
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        next(error);
     });
 });
 
-/**
- *  Create a team
- */
+//**********************//
+//*   CREATE A TEAM    *//
+//**********************//
 router.post('/team', function(req, res, next) 
 {
     let teamName = req.body.name;
@@ -185,7 +215,6 @@ router.post('/team', function(req, res, next)
 
     // check request body values
     if (!teamName || teamName === '') {
-        console.log('team name: ' + teamName);
         next(createError(401, "team name field is missing"));
         return;
     }
