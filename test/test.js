@@ -38,12 +38,30 @@ function createBoard(res2)
                     teamId: res2.body.id // using response2's team id
                 });
 }
+
 function createList(res3)
 {
-    return agent.post()
+    return agent.post('/list')
                 .send({
-                    // do something
-                });
+                    name: 'listy',
+                    ownerId: 1,
+                    boardId: res3.body.id,
+                    order: 1
+                })
+}
+
+function createUpToList(done)
+{
+    return login().then(function(res) {
+        return createTeam(res).then(function(res2) {
+            return createBoard(res2).then(function(res3) {
+                return createList(res3);
+            })
+            .catch( err => { done(err); } );
+        })
+        .catch( err => { done(err); } );
+    })
+    .catch( err => { done(err); } );
 }
 
 /**************/
@@ -697,6 +715,170 @@ describe('lists', function()
                         .catch( err => { done(err); });
                     })
                     .catch( err => { done(err); });
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+    });
+});
+
+/**************/
+/*   CARDS    */
+/**************/
+describe('cards', function()
+{
+    describe('card creation', function()
+    {
+        it('should fail when card name field is missing', function(done)
+        {
+            // create everything up to the list
+            createUpToList(done).then(function(res) {
+                // create a card in that list
+                return agent.post('/card')
+                .send({})
+                .then(function(res2) {
+                    expect(res2).to.have.status(401);
+                    done();
+                })
+                .catch( err => { next(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should fail when owner ID field is missing', function(done)
+        {
+            // create everything up to the list
+            createUpToList(done).then(function(res) {
+                // create a card in that list
+                return agent.post('/card')
+                .send({
+                    name: 'cardo'
+                })
+                .then(function(res2) {
+                    expect(res2).to.have.status(500);
+                    done();
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should fail when owner ID field is a string', function(done)
+        {
+            // create everything up to the list
+            createUpToList(done).then(function(res) {
+                // create a card in that list
+                return agent.post('/card')
+                .send({
+                    name: 'cardo',
+                    ownerId: 'dud'
+                })
+                .then(function(res2) {
+                    expect(res2).to.have.status(401);
+                    done();
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should fail when list ID field is missing', function(done)
+        {
+            // create everything up to the list
+            createUpToList(done).then(function(res) {
+                // create a card in that list
+                return agent.post('/card')
+                .send({
+                    name: 'cardo',
+                    ownerId: 1
+                })
+                .then(function(res2) {
+                    expect(res2).to.have.status(401);
+                    done();
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should fail when list ID field is a string', function(done)
+        {
+            // create everything up to the list
+            createUpToList(done).then(function(res) {
+                // create a card in that list
+                return agent.post('/card')
+                .send({
+                    name: 'cardo',
+                    ownerId: 1,
+                    listId: 'hello'
+                })
+                .then(function(res2) {
+                    expect(res2).to.have.status(401);
+                    done();
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should fail when order field is missing', function(done)
+        {
+            // create everything up to the list
+            createUpToList(done).then(function(res) {
+                // create a card in that list
+                return agent.post('/card')
+                .send({
+                    name: 'cardo',
+                    ownerId: 1,
+                    listId: res.body.id
+                })
+                .then(function(res2) {
+                    expect(res2).to.have.status(401);
+                    done();
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should fail when order field is a string', function(done)
+        {
+            // create everything up to the list
+            createUpToList(done).then(function(res) {
+                // create a card in that list
+                return agent.post('/card')
+                .send({
+                    name: 'cardo',
+                    ownerId: 1,
+                    listId: res.body.id,
+                    order: 'dud'
+                })
+                .then(function(res2) {
+                    expect(res2).to.have.status(401);
+                    done();
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should succed when all fields are correct', function(done)
+        {
+            // create everything up to the list
+            createUpToList(done).then(function(res) {
+                // create a card in that list
+                return agent.post('/card')
+                .send({
+                    name: 'cardo',
+                    ownerId: 1,
+                    listId: res.body.id,
+                    order: 1
+                })
+                .then(function(res2) {
+                    expect(res2).to.have.status(200);
+                    done();
                 })
                 .catch( err => { done(err); });
             })

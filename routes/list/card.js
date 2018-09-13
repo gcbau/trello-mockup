@@ -43,7 +43,7 @@ router.post('/card', function(req,res, next)
 
     // check request values
     if (!name || name === '') {
-        next(createError(401, "board name field is missing"));
+        next(createError(401, "card name field is missing"));
         return;
     }
     if (!ownerId || ownerId === '') {
@@ -56,6 +56,10 @@ router.post('/card', function(req,res, next)
     }
     if (!order) {
         next(createError(401, "order value is missing"));
+        return;
+    }
+    if (typeof ownerId === 'string') {
+        next(createError(401, "list ID must never be a string"));
         return;
     }
     if (typeof listId === 'string') {
