@@ -7,13 +7,14 @@
 //*********************//
 
 function generateBoardItemResult(board) {
-    let boardName = board.name;
+    console.log(board)
+    let boardName = board.boardName;
     if (20 < boardName.length) {
         boardName = boardName.substring(0,20) + '...';
     }
     return `
         <div class="board-link-container">
-            <a href="/b/${board.id}/${board.name}">${boardName}</a>
+            <a href="/b/${board.boardId}/${board.boardName}">${boardName}</a>
         </div>
     `;
 }
@@ -228,34 +229,42 @@ function searchQuery(query)
 
 function displayResults(data)
 {
-    console.log('displaying results');
-    let boards = data.boards;
-    let cards  = data.cards;
+    console.log('displaying search results');
+    console.log(data);
+
     let $searchResults = $('#search-results');
     $searchResults.empty();
 
-    if (0 >= cards.length && 0 >= boards.length) {
+    if (0 >= data.length) {
         $searchResults.append('<p style="padding-left:10px;">No results found.</p>');
         return;
     }
 
-    if (0 < cards.length) {
+
+    let $cards;
+    let $boards;
+    let isCard = true;
+
+    if (data[0].cardId) {
         $searchResults.append($('<div id="card-results"><h4>Cards</h4></div>'));
-        let $cards = $('#card-results');
-        for (let i=0; i<cards.length; ++i) {
-            let card = cards[i];
-            let cardName = card.name;
+        $cards = $('#card-results');
+    }
+    for (let i=0; i<data.length; ++i) {
+        if (isCard && !data[i].cardId) {
+            $searchResults.append($('<div id="board-results"><h4>Boards</h4></div>'));
+            $boards = $('#board-results');
+            isCard = false;
+        }
+
+        if (isCard) {
+            let card = data[i];
+            let cardName = card.cardName;
             if (40 < cardName.length) {
                 cardName = cardName.substring(0,40) + '...';
             }
-            $cards.append($(`<a href="/b/${card.boardId}/${card.boardName}#${card.id}">${cardName}</a>`));
-        }
-    }
-    if (0 < boards.length) {
-        $searchResults.append($('<div id="board-results"><h4>Boards</h4></div>'));
-        let $boards = $('#board-results');
-        for (let i=0; i<boards.length; ++i) {
-            let board = boards[i];
+            $cards.append($(`<a href="/b/${card.boardId}/${card.boardName}#${card.cardId}">${cardName}</a>`));
+        } else {    
+            let board = data[i];
             $boards.append($(generateBoardItemResult(board)));
         }
     }
