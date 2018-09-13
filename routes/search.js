@@ -21,8 +21,11 @@ router.get('/search', function(req, res, next)
 
     // build query
     let query = `
-        (
-        SELECT NULL AS "cardId", NULL AS "cardName", b."id" AS "boardId", b."name" AS "boardName", ts_rank_cd(b."nameVectors", query, 10) AS "rank"
+    (
+        SELECT NULL AS "cardId", NULL AS "cardName",              -- card  info
+               NULL AS "listId", NULL AS "listName",              -- list  info
+               b."id" AS "boardId", b."name" AS "boardName",      -- board info
+               ts_rank_cd(b."nameVectors", query, 10) AS "rank"   -- rank
         FROM (
         
             SELECT DISTINCT b.*
@@ -42,17 +45,20 @@ router.get('/search', function(req, res, next)
         )
         UNION
         (
-        SELECT DISTINCT c.id AS "cardId", c.name AS "cardName", b.id AS "boardId", b.name AS "boardName", ts_rank_cd(c."nameVectors", query) AS "rank"
+        SELECT DISTINCT c.id AS "cardId",  c.name AS "cardName",      -- card  info
+                        l.id AS "listId",  l.name AS "listName",      -- list  info
+                        b.id AS "boardId", b.name AS "boardName",     -- board info
+                        ts_rank_cd(c."nameVectors", query) AS "rank"  -- rank
         FROM "cards" c
-        INNER JOIN "lists" l ON l."id" = c."listId"
+        INNER JOIN "lists" l  ON l."id" = c."listId"
         INNER JOIN "boards" b ON l."boardId" = b."id"
         LEFT JOIN "teamUsers" tU ON tU."teamId" = b."teamId",
              to_tsquery(:name) query
         WHERE (c."ownerId" = :userId OR tU."userId" = :userId)
           AND query @@ c."nameVectors"
         ORDER BY "rank" desc
-        )
-        ORDER BY "rank" desc, "cardId"
+    )
+    ORDER BY "rank" desc, "cardId"
     `;
 
     // execute query
