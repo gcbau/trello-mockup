@@ -40,9 +40,9 @@ router.post('/card', function(req,res)
 
     let query = `
         INSERT INTO "cards"
-            ("listId", "ownerId", "name", "description", "order", "createdOn")
+            ("listId", "ownerId", "name", "description", "order", "createdOn", "nameVectors")
         VALUES
-            (:listId, :ownerId, :name, :description, :order, NOW())
+            (:listId, :ownerId, :name, :description, :order, NOW(), to_tsvector(:name))
         RETURNING * ;
     `;
 
