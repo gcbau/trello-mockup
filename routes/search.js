@@ -13,8 +13,66 @@ var db = require('../models/index');
 
 router.get('/search', function(req, res, next) 
 {
-    searchBoards(req,res,next);
+    // searchBoards(req,res,next);
+
+    // check if user input is valid
+    let userInput = req.query.q.replace('-', ' ');
+    let userId = req.session.user.id;
+
+    // build query
+    let query = `
+        (
+        SELECT NULL AS "cardId", NULL AS "cardName", b."id" AS "boardId", b."name" AS "boardName", ts_rank_cd(b."nameVectors", query, 10) AS "rank"
+        FROM (
+        
+            SELECT DISTINCT b.*
+            FROM "boards" b
+            WHERE b."teamId" ISNULL AND "ownerId" = :userId
+            -- select all the personal boards first
+            UNION
+            -- select all the team boards second
+            SELECT DISTINCT b.*
+            FROM "boards" b
+            INNER JOIN "teamUsers" tu ON tu."teamId" = b."teamId"
+            WHERE tu."userId" = :userId
+        
+        ) AS b, to_tsquery(:name) query
+        WHERE query @@ b."nameVectors"
+        ORDER BY "rank" DESC
+        )
+        UNION
+        (
+        SELECT DISTINCT c.id AS "cardId", c.name AS "cardName", b.id AS "boardId", b.name AS "boardName", ts_rank_cd(c."nameVectors", query) AS "rank"
+        FROM "cards" c
+        INNER JOIN "lists" l ON l."id" = c."listId"
+        INNER JOIN "boards" b ON l."boardId" = b."id"
+        LEFT JOIN "teamUsers" tU ON tU."teamId" = b."teamId",
+             to_tsquery(:name) query
+        WHERE (c."ownerId" = :userId OR tU."userId" = :userId)
+          AND query @@ c."nameVectors"
+        ORDER BY "rank" desc
+        )
+        ORDER BY "rank" desc, "cardId"
+    `;
+
+    // execute query
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.SELECT,
+        replacements: {
+            name: userInput,
+            userId: userId
+        }
+    })
+    .then( (sqlres) => {
+        res.status(200).json(sqlres);
+    })
+    .catch( (err) => {
+        console.error("err");
+        next(err);
+    });
 })
+
+
 
 function searchBoards(req, res, next) 
 {
