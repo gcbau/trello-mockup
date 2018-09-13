@@ -7,6 +7,21 @@ var app = require('../app');
 chai.use(chaiHttp);
 
 /**************/
+/*   HELPER   */
+/**************/
+
+var agent = chai.request.agent(app);
+function login()
+{
+    return agent
+                .post('/home/login')
+                .send({
+                    email: 'bobby@bobber.bobcat',
+                    pw: 'bobbiebobbacat'
+                })
+}
+
+/**************/
 /*   LOGIN    */
 /**************/
 
@@ -25,7 +40,7 @@ describe('Login Page', function()
             .then(function(res) {
                 expect(res).to.have.status(401);
                 expect(res.text).to.eql('first name field is missing');
-                done()
+                done();
             })
             .catch(function(err) {
                 done(err);
@@ -209,14 +224,141 @@ describe('Login Page', function()
         });
     });
 
-    //*****************//
-    //   boards page
-    //*****************//
+    //***************************//
+    //   boards: team creation
+    //***************************//
     describe('team creation', function()
     {
-        it('should', function(done)
+        it('should fail when team name field is missing', function(done)
         {
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/team')
+                            .send({})
+                            .then(function(res2) {
+                                expect(res2).to.have.status(401);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
 
+        it('should fail when userId field is missing', function(done)
+        {
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/team')
+                            .send({
+                                name: 'boblist 1'
+                            })
+                            .then(function(res2) {
+                                expect(res2).to.have.status(500);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
+
+        it('should fail when userId expected is different', function(done)
+        {
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/team')
+                            .send({
+                                name: 'boblist 1',
+                                ownerId: 2
+                            })
+                            .then(function(res2) {
+                                expect(res2).to.have.status(400);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
+
+        it('should fail when userId does not exist', function(done)
+        {
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/team')
+                            .send({
+                                name: 'boblist 1',
+                                ownerId: 2
+                            })
+                            .then(function(res2) {
+                                expect(res2).to.have.status(400);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
+
+        it('should succeed when all the fields are correct', function(done)
+        {
+            login()
+            .then(function(res) {
+                expect(res).to.have.status(200);
+                
+                return agent
+                            .post('/bobbobster/boards/team')
+                            .send({
+                                name: 'boblist 1',
+                                ownerId: 1
+                            })
+                            .then(function(res2) {
+                                expect(res2).to.have.status(200);
+                                done();
+                            })
+                            .catch(function(err) {
+                                done(err);
+                            })
+            })
+            .catch(function(err){
+                done(err);
+            });
+        });
+    });
+
+    //***************************//
+    //   boards: board creation
+    //***************************//
+    describe('board creation', function()
+    {
+        it('should fail', function(done)
+        {
+            done();
         });
     });
 });

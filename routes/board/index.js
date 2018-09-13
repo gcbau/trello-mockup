@@ -2,6 +2,9 @@ var express = require('express');
 var router = express.Router();
 var db = require('../../models/index');
 
+var status = require('http-status');
+var createError = require('http-errors');
+
 router.use(function(req, res, next) {
     res.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
     next();
@@ -42,7 +45,7 @@ function getRecentBoards(req, res, next)
         getPersonalTeamBoards(recentBoards, req, res, next);
     })
     .catch( err => {
-        console.error(err);
+        console.catch(err);
         next(err);
     })
 }
@@ -51,39 +54,12 @@ function getPersonalTeamBoards(recentboards, req, res, next)
 {
     let user = req.session.user;
     let uid  = user.id;
-
-    // build query to get personal & team boards
-
-        // SELECT t.id "teamId", t.name "teamName", "tb"."boards"
-        // FROM (SELECT t.id, tu."joinedAt", json_agg(DISTINCT b.*) AS "boards"
-        //     FROM "teams" t
-        //     FULL OUTER JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
-        //         ON t."id" = "b"."teamId"
-        //     LEFT JOIN "teamUsers" tu
-        //         ON "tu"."teamId" = "t"."id"
-        //     WHERE "b"."ownerId" = :id OR "tu"."userId" = :id
-        //     GROUP BY t.id, tu."joinedAt") tb
-        // LEFT JOIN "teams" t
-        //     ON "t"."id" = "tb"."id"
-        // ORDER BY tb."joinedAt" DESC
-
-        // SELECT t."teamId", t.name "teamName", json_agg(DISTINCT b.*) AS "boards"
-        // FROM
-        //     (SELECT DISTINCT ON (tu."joinedAt") tu."teamId", t."name", tu."joinedAt"
-        //     FROM "teamUsers" tu
-        //     INNER JOIN teams t
-        //             ON tu."teamId" = t.id
-        //     WHERE tu."userId" = :id) t
-        // LEFT JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
-        //     ON b."teamId" = t."teamId"
-        // GROUP BY t."teamId", t.name, t."joinedAt"
-        // ORDER BY t."joinedAt" DESC;
         
-
+    // build query
     let query = `
     ( -- SELECT ALL BOARDS WITH NO TEAMID FIRST
         SELECT NULL "teamId", NULL "teamName", json_agg(b.*) "boards"
-        FROM "boards" AS b
+        FROM (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) AS b
         WHERE b."teamId" ISNULL AND b."ownerId" = :id
     )
     
@@ -98,7 +74,7 @@ function getPersonalTeamBoards(recentboards, req, res, next)
                     ON tu."teamId" = t."id"
             WHERE tu."userId" = :id
     ) AS t
-    LEFT JOIN "boards" b
+    LEFT JOIN (SELECT * FROM "boards" b ORDER BY b."createdOn" DESC) b
         ON b."teamId" = t."teamId"
     GROUP BY t."teamId", t."teamName", t."joinedAt"
     ORDER BY t."joinedAt" DESC
@@ -115,7 +91,7 @@ function getPersonalTeamBoards(recentboards, req, res, next)
     .then( otherBoards => {
         renderPage(req, res, recentboards, otherBoards);
     })
-    .error( err => {
+    .catch( err => {
         next(createError(err));
     });
 }
@@ -193,7 +169,7 @@ router.post('/board', function(req, res)
         let data = sqlres[0][0];
         res.status(200).json(data);
     })
-    .error( err => {
+    .catch( err => {
         next(err);
     });
 });
@@ -201,10 +177,25 @@ router.post('/board', function(req, res)
 /**
  *  Create a team
  */
-router.post('/team', function(req, res) 
+router.post('/team', function(req, res, next) 
 {
-    // get request args
-    let args = req.body;
+    let teamName = req.body.name;
+    let ownerId  = req.body.ownerId;
+    let description = req.body.description;
+
+    // check request body values
+    if (!teamName || teamName === '') {
+        console.log('team name: ' + teamName);
+        next(createError(401, "team name field is missing"));
+        return;
+    }
+    if (!ownerId || ownerId === '') {
+        next(createError(500, "user ID is missing"));
+        return;
+    }
+    if (!description) {
+        req.body.description = '';
+    }
 
     let insertQuery = `
         INSERT INTO "teams" 
@@ -216,11 +207,16 @@ router.post('/team', function(req, res)
     
     // insert into teams first
     db.sequelize.query(insertQuery, {
-        replacements: args,
+        replacements: req.body,
         type: db.sequelize.QueryTypes.INSERT
     })
     .then( sqlResponse => {
         let data = sqlResponse[0][0];
+
+        if (!data.id) {
+            next(createError(500, 'could not insert team into database for unexpected reason'));
+            return;
+        };
 
         insertQuery = `
             INSERT INTO "teamUsers" ("teamId","userId","joinedAt")
@@ -230,17 +226,30 @@ router.post('/team', function(req, res)
         db.sequelize.query(insertQuery, {
             replacements: {
                 teamId: data.id,
-                userId: args.ownerId
+                userId: req.body.ownerId
             },
             type: db.sequelize.QueryTypes.INSERT
         })
-        .then( sqlResponse2 => {
+        .then( () => {
             res.status(200).json(data);
         })
-        .error();
+        .catch( err => {
+            next(createError(500, err));
+            return;
+        });
     })
-    .error( err => {
-        console.error(err);
+    .catch( err => {
+        let error = err;
+        switch(err.name) {
+            case 'SequelizeForeignKeyConstraintError': {
+                error = createError(400, 'trying to add team by a user that does not exist');
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+        next(error);
     });
 });
 

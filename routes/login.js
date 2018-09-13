@@ -55,6 +55,7 @@ router.post('/login', function(req, res, next) {
 
 /** sign up */
 router.post('/signup', function(req, res, next) {
+
   let first = req.body.first;
   let last  = req.body.last;
   let email = req.body.email;
