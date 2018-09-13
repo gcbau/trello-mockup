@@ -1,13 +1,15 @@
 var express = require('express');
 var router = express.Router();
-var db = require('../../models/index')
+var db = require('../../models/index');
 
+var status = require('http-status');
+var createError = require('http-errors');
+
+//*******************//
+//*   RENDER PAGE   *//
+//*******************//
 router.get('/b/:bid/:bname', function(req, res, next) 
 {
-    console.log(' ');
-    console.log(req.params);
-    console.log(' ');
-
     // update board's last viewed
     let query = `
         UPDATE "boards" b
@@ -26,7 +28,6 @@ router.get('/b/:bid/:bname', function(req, res, next)
         // res.render('lists');
     })
     .catch( err => {
-        console.error(err);
         next(err);
     })
 });
@@ -63,7 +64,7 @@ function getPersonalTeamBoards(req, res, next)
     .then( otherBoards => {
         renderPage(req, res, otherBoards);
     })
-    .error( err => {
+    .catch( err => {
         next(createError(err));
     });
 }
@@ -101,22 +102,11 @@ function renderPage(req, res, data)
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-router.get('/team', function(req,res) {
-    console.log(' ');
-    console.log(req.query);
-    console.log(' ');
-
+//*****************************//
+//*   GET TEAM ID FROM BOARD  *//
+//*****************************//
+router.get('/team', function(req,res, next)
+{
     let query = `
         SELECT b."teamId"
         FROM "boards" b
@@ -130,11 +120,15 @@ router.get('/team', function(req,res) {
     .then( (data) => {
         res.status(200).json(data[0].teamId);
     })
-    .error();
+    .catch();
 
 });
 
-router.get('/list/:id/:bid', function(req,res) {
+//******************************//
+//*   GET ALL LISTS IN ORDER   *//
+//******************************//
+router.get('/list/:id/:bid', function(req,res, next) 
+{
     let query = `
         SELECT DISTINCT l.*
         FROM "lists" l
@@ -152,12 +146,52 @@ router.get('/list/:id/:bid', function(req,res) {
         type: db.sequelize.QueryTypes.SELECT
     }).then( data => {
         res.status(200).json(data);
-    }).error( err => {
-        console.error(err);
+    }).catch( err => {
+        
     });
 });
 
-router.post('/list', function(req,res) {
+//********************//
+//*   CREATE LIST    *//
+//********************//
+router.post('/list', function(req,res, next) 
+{
+    let name    = req.body.name;
+    let ownerId = req.body.ownerId;
+    let boardId = req.body.boardId;
+    let order   = req.body.order;
+
+    // check request values
+    if (!name || name === '') {
+        next(createError(401, "list name field is missing"));
+        return;
+    }
+    if (!ownerId) {
+        next(createError(401, "owner ID value is missing"));
+        return;
+    }
+    if (!boardId) {
+        next(createError(401, "board ID value is missing"));
+        return;
+    }
+    if (!order) {
+        next(createError(401, "order value is missing"));
+        return;
+    }
+    if (typeof ownerId === 'string') {
+        next(createError(401, "user ID must never be a string"));
+        return;
+    }
+    if (typeof boardId === 'string') {
+        next(createError(401, "board ID must never be a string"));
+        return;
+    }
+    if (typeof order === 'string') {
+        next(createError(401, "order must never be a string"));
+        return;
+    }
+
+    // build insertion querystring
     let query = `
         INSERT INTO "lists" 
             ("boardId", "ownerId", "name", "order")
@@ -166,18 +200,26 @@ router.post('/list', function(req,res) {
         RETURNING * ;
     `;
 
+    // execute query
     db.sequelize.query(query, {
         replacements: req.body,
         type: db.sequelize.QueryTypes.INSERT
-    }).then( data => {
+    })
+    .then( data => {
         res.status(200).json(data[0][0]);
-    }
-    ).error( err => {
-        console.error(err);
+    })
+    .catch( err => {
+        let error = err;
+        next(createError(400,error));
     });
 });
 
-router.patch('/board/:boardId/list', function(req,res,next) {
+
+//******************************//
+//*   UPDATE ORDER OF LISTS    *//
+//******************************//
+router.patch('/board/:boardId/list', function(req,res,next) 
+{
     let lists = JSON.parse(req.body.lists);
     let queries = '';
     for (let i=0; i<lists.length; ++i) {

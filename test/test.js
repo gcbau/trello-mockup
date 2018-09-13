@@ -10,14 +10,40 @@ chai.use(chaiHttp);
 /*   HELPER   */
 /**************/
 var agent = chai.request.agent(app);
+
 function login()
 {
-    return agent
-                .post('/home/login')
+    return agent.post('/home/login')
                 .send({
                     email: 'bobby@bobber.bobcat',
                     pw: 'bobbiebobbacat'
-                })
+                });
+}
+
+function createTeam(res)
+{
+    return agent.post('/bobbobster/boards/team')
+                .send({
+                    name: 'boblist 1',
+                    ownerId: 1
+                });
+}
+
+function createBoard(res2)
+{
+    return agent.post('/bobbobster/boards/board')
+                .send({
+                    name: 'bobboard 1',
+                    ownerId: 1,
+                    teamId: res2.body.id // using response2's team id
+                });
+}
+function createList(res3)
+{
+    return agent.post()
+                .send({
+                    // do something
+                });
 }
 
 /**************/
@@ -511,40 +537,23 @@ describe('boards page', function()
         it('should succeed when all fields are correct and team Id is provided', function(done)
         {
             // login first
-            login()
-            .then(function(res) {
-                expect(res).to.have.status(200);
-                
+            login().then(function(res) {        
                 // create team second
-                agent
-                    .post('/bobbobster/boards/team')
-                    .send({
-                        name: 'boblist 1',
-                        ownerId: 1
-                    })
-                    .then(function(res2) {
-                        expect(res2).to.have.status(200);
-
-                        // create a board in that team third
-                        agent
-                        .post('/bobbobster/boards/board')
-                        .send({
-                            name: 'bobboard 1',
-                            ownerId: 1,
-                            teamId: res2.body.id // using response2's team id
-                        })
-                        .then(function(res3) {
-                            expect(res3).to.have.status(200);
-                            done();
-                        })
-                        .catch(function(err) {
-                            done(err);
-                        });
-
+                createTeam(res).then(function(res2) {
+                    // create a board in that team third
+                    createBoard(res2).then(function(res3) {
+                        expect(res3).to.have.status(200);
+                        
+                        // finish
+                        done();
                     })
                     .catch(function(err) {
                         done(err);
-                    })
+                    });
+                })
+                .catch(function(err) {
+                    done(err);
+                })
             })
             .catch(function(err){
                 done(err);
@@ -558,11 +567,141 @@ describe('boards page', function()
 /**************/
 describe('lists', function()
 {
-    describe('card creation', function()
-    {
-        it('should fail ', function(done)
+    describe('list creation', function()
+    {   
+        it('should fail when list name field is missing', function(done)
         {
-            done();
-        })
-    })
+            // login first
+            login().then(function(res) {        
+                // create team second
+                createTeam(res).then(function(res2) {
+                    // create a board in that team third
+                    createBoard(res2).then(function(res3) {
+                        // create a list in that board
+                        return agent.post('/list')
+                        .send({})
+                        .then(function(res4) {
+                            expect(res4).to.have.status(401);
+                            done();
+                        })
+                        .catch( err => { done(err); });
+                    })
+                    .catch( err => { done(err); });
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should fail when owner id field is missing', function(done)
+        {
+            // login first
+            login().then(function(res) {        
+                // create team second
+                createTeam(res).then(function(res2) {
+                    // create a board in that team third
+                    createBoard(res2).then(function(res3) {
+                        // create a list in that board
+                        return agent.post('/list')
+                        .send({
+                            name: 'listy'
+                        })
+                        .then(function(res4) {
+                            expect(res4).to.have.status(401);
+                            done();
+                        })
+                        .catch( err => { done(err); });
+                    })
+                    .catch( err => { done(err); });
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should fail when boardId field is missing', function(done)
+        {
+            // login first
+            login().then(function(res) {        
+                // create team second
+                createTeam(res).then(function(res2) {
+                    // create a board in that team third
+                    createBoard(res2).then(function(res3) {
+                        // create a list in that board
+                        return agent.post('/list')
+                        .send({
+                            name: 'listy',
+                            ownerId: 1
+                        })
+                        .then(function(res4) {
+                            expect(res4).to.have.status(401);
+                            done();
+                        })
+                        .catch( err => { done(err); });
+                    })
+                    .catch( err => { done(err); });
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should fail when order field is missing', function(done)
+        {
+            // login first
+            login().then(function(res) {        
+                // create team second
+                createTeam(res).then(function(res2) {
+                    // create a board in that team third
+                    createBoard(res2).then(function(res3) {
+                        // create a list in that board
+                        return agent.post('/list')
+                        .send({
+                            name: 'listy',
+                            ownerId: 1,
+                            boardId: res3.body.id
+                        })
+                        .then(function(res4) {
+                            expect(res4).to.have.status(401);
+                            done();
+                        })
+                        .catch( err => { done(err); });
+                    })
+                    .catch( err => { done(err); });
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+        it('should succeed when all fields are correct', function(done)
+        {
+            // login first
+            login().then(function(res) {        
+                // create team second
+                createTeam(res).then(function(res2) {
+                    // create a board in that team third
+                    createBoard(res2).then(function(res3) {
+                        // create a list in that board
+                        return agent.post('/list')
+                        .send({
+                            name: 'listy',
+                            ownerId: 1,
+                            boardId: res3.body.id,
+                            order: 1
+                        })
+                        .then(function(res4) {
+                            expect(res4).to.have.status(200);
+                            done();
+                        })
+                        .catch( err => { done(err); });
+                    })
+                    .catch( err => { done(err); });
+                })
+                .catch( err => { done(err); });
+            })
+            .catch( err => { done(err); });
+        });
+
+    });
 });

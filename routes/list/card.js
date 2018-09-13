@@ -2,12 +2,12 @@ var express = require('express');
 var router = express.Router();
 var db = require('../../models/index');
 
-router.get('/card/:uid/:bid', function(req,res) 
+var status = require('http-status');
+var createError = require('http-errors');
+
+router.get('/card/:uid/:bid', function(req,res, next) 
 {
-    console.log(' ');
-    console.log('GET: /card/:uid/:bid');
-    console.log(req.params);
-    console.log(' ');
+
 
     let query = `
         SELECT l.id listId, json_agg(c.*) cards
@@ -33,11 +33,45 @@ router.get('/card/:uid/:bid', function(req,res)
 
 })
 
-router.post('/card', function(req,res) 
+router.post('/card', function(req,res, next) 
 {
-    console.log('POST: /card');
-    console.log(req.body);
+    let name        = req.body.name;
+    let ownerId     = req.body.ownerId;
+    let listId      = req.body.listId;
+    let description = req.body.description;
+    let order       = req.body.order;
 
+    // check request values
+    if (!name || name === '') {
+        next(createError(401, "board name field is missing"));
+        return;
+    }
+    if (!ownerId || ownerId === '') {
+        next(createError(500, "user ID value is missing"));
+        return;
+    }
+    if (!listId) {
+        next(createError(401, "list ID value is missing"));
+        return;
+    }
+    if (!order) {
+        next(createError(401, "order value is missing"));
+        return;
+    }
+    if (typeof listId === 'string') {
+        next(createError(401, "list ID must never be a string"));
+        return;
+    }
+    if (typeof order === 'string') {
+        next(createError(401, "order must never be a string"));
+        return;
+    }
+
+    if (!description) {
+        req.body.description = '';
+    }
+
+    // build insertion querystring
     let query = `
         INSERT INTO "cards"
             ("listId", "ownerId", "name", "description", "order", "createdOn", "nameVectors")
@@ -46,12 +80,17 @@ router.post('/card', function(req,res)
         RETURNING * ;
     `;
 
+    // execute query
     db.sequelize.query(query, {
         replacements: req.body,
         type: db.sequelize.QueryTypes.INSERT
     })
     .then( (data) => {
         res.status(200).json(data[0][0]);
+    })
+    .catch( (err) => {
+        let error = err;
+        next(createError(400, error));
     })
 });
 
@@ -82,8 +121,8 @@ router.patch('/list/:lid/card', function(req,res, next)
     .then( hello => {
         res.status(200).json(hello);
     })
-    .error( err => {
-        console.error(err);
+    .catch( err => {
+        console.catch(err);
         next(err);
     });
 });
