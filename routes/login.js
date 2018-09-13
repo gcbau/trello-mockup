@@ -30,12 +30,14 @@ router.post('/login', function(req, res, next) {
     type:db.sequelize.QueryTypes.SELECT 
   })
   .then(sqlResponse => {
+    // check if email has a match
     if (0 >= sqlResponse.length) {
-      next(createError(401));
+      next(createError(401, "Email or password is incorrect."));
       return;
     }
+    // check if password is correct
     if (sqlResponse[0].password !== pw) {
-      next(createError(403));
+      next(createError(401, "Email or password is incorrect."));
       return;
     }
 
@@ -44,6 +46,9 @@ router.post('/login', function(req, res, next) {
     req.session.user = sqlResponse[0];
     // send OK response
     res.status(200).json(req.session.user);
+  })
+  .catch( (err) => {
+    next(createError(400, err));
   });
 });
 
@@ -55,7 +60,6 @@ router.post('/signup', function(req, res, next) {
   let email = req.body.email;
   let pw    = req.body.pw;
 
-  console.log(first === undefined);
   if (first === undefined || first === '') {
     next(createError(401, "first name field is missing"));
     return;
