@@ -13,6 +13,7 @@ router.get('/card/:id', function(req,res,next)
     let query = `
         SELECT
             c.id,                                   -- select card ID
+            c.name,                                 -- select card name
             c.description,                          -- select card Description
 
             (SELECT json_agg(l.*) "labels"
@@ -46,6 +47,33 @@ router.get('/card/:id', function(req,res,next)
         next(createError(err));
     });
 });
+
+//*********************//
+//  STORE DESCRIPTION
+//*********************//
+router.patch('/description', function(req,res,next)
+{
+    console.log(req.body);
+
+    // build query
+    let query = `
+        UPDATE "cards" c
+        SET "description" = :description
+        WHERE c."id" = :cardId;
+    `;
+
+    db.sequelize.query(query, {
+        type: db.sequelize.QueryTypes.UPDATE,
+        replacements: req.body
+    })
+    .then( (sqlres) => {
+        res.status(200).json(sqlres);
+    })
+    .catch( (err) => {
+        console.error(err);
+        next(err);
+    })
+})
 
 //******************//
 //  RETRIEVE LABEL

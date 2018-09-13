@@ -8,10 +8,11 @@ var currentLabels;
 function generateCommentHTML(comment)
 {
     let userInitials = comment.firstName[0].toUpperCase()+comment.lastName[0].toUpperCase();
+    let date = comment.createdOn.replace('T', ' ').replace(/\..*/, '');
     return `
     <div class="activity-item">
         <div class="activity-item-profile">${userInitials}</div>
-        <div class="activity-item-heading">${comment.firstName} ${comment.lastName}</div>
+        <div class="activity-item-heading">${comment.firstName} ${comment.lastName} <span class="activity-item-date">on ${date}</span></div>
         <div class="activity-item-body">${comment.body.replace('\n','<br>')}</div>
     </div>
     `;
@@ -58,6 +59,10 @@ function displayCardModal(e)
             // add card info to html
             console.log("displayCardModal() success: ", data);
 
+            // fill in title
+            let $title = $('#title-content');
+            $title.html(`<h3><i class="far fa-window-maximize"></i>${data.name}</h3>`);
+
             // fill in label section
             if (data.labels[0]) {
                 for (let i=0; i<data.labels.length; ++i) {
@@ -66,10 +71,12 @@ function displayCardModal(e)
                     displayLabel(label.name, $('#label-input'));
                 }
             }
-            console.log(currentLabels);
+
+            // fill in description
+            let $description = $('#description');
+            $description.html(data.description);
 
             // fill in new comment section
-            console.log(initials);
             $('.profile-new-comment').html(initials);
 
             // fill in activity section
@@ -211,8 +218,24 @@ function hideDescriptionInput(e)
 {
     console.log('hiding description input..');
     let $description =$(e.target);
-    let val = $description.val();
+    let val = $description.val().trim();
     $description.replaceWith($(`<div id="description">${val}</div>`));
+
+    // save description
+    $.ajax({
+        url: '/description',
+        method: 'patch',
+        data: { 
+            cardId: cardId,
+            description: val 
+        },
+        success: (data) => {
+            console.log(data);
+        },
+        error: (err) => {
+            console.error(err);
+        }
+    })
 }
 
 //******************//

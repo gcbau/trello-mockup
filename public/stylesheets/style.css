@@ -320,17 +320,20 @@ h2 {
 
 /** Labels */
 #labels-content {
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .labels-container {
-    margin-left: 52px;
     position: relative;
+    margin-left: 52px;
     width: 650px;
+
     border: 1px solid black;
-    cursor: text;
-    font-size: 0;
+    border-radius: 5px;
+
     padding: 5px;
+    font-size: 0;
+    cursor: text;
 }
 
 .label {
@@ -368,18 +371,23 @@ h2 {
 
 /** Description */
 #description-content {
-    margin-top: 30px;
+    margin-top: 20px;
     width: 100%;
 }
 #description {
-    margin-left: 52px;
+    margin-left: 50px;
     width: 650px;
-    min-height: 60px;
-    height: auto;
+    height: 60px;
+
     border: 1px solid black;
+    border-radius: 5px;
 
     padding: 10px;
     cursor: pointer;
+}
+
+.fa-list {
+    margin-right: 13px!important;
 }
 
 #description.editable {
@@ -388,7 +396,7 @@ h2 {
 
 /** New Comment */
 #comment-content {
-    margin-top: 30px;
+    margin-top: 20px;
     width: 100%;
 }
 
@@ -413,15 +421,25 @@ h2 {
 }
 
 #comment-content #comment-input {
-    width: 625px;
+    width: 650px;
     height: 80px;
     resize: none;
+
+    border: 1px solid black;
+    border-radius: 5px;
 
     padding: 10px;
 }
 
 #save-comment {
     margin-top: 10px;
+    border: 1px solid grey;
+    border-radius: 5px;
+}
+
+#save-comment:hover:enabled {
+    cursor: pointer;
+    background: rgba(0,0,0,.1);
 }
 
 /** Activity */
@@ -458,6 +476,10 @@ h2 {
 
 .activity-item-heading {
     padding-top: 10px;
+}
+
+.activity-item-date {
+    font-size: 12px!important;
 }
 
 .activity-item-body {
