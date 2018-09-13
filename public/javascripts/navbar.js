@@ -262,7 +262,14 @@ function displayResults(data)
             if (40 < cardName.length) {
                 cardName = cardName.substring(0,40) + '...';
             }
-            $cards.append($(`<a href="/b/${card.boardId}/${card.boardName}#${card.cardId}">${cardName}</a>`));
+            $cards.append($(`
+                <div class="card-search-item">
+                    <a class="card-link" href="/b/${card.boardId}/${card.boardName}#${card.cardId}">${cardName}</a>
+                    <span class="card-link-info">
+                        from list: <strong>${card.listName}</strong><br>from board: <strong>${card.boardName}</strong>
+                    </span>
+                </div>
+            `));
         } else {    
             let board = data[i];
             $boards.append($(generateBoardItemResult(board)));

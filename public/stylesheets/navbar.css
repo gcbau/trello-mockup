@@ -363,19 +363,48 @@
 }
 
 #search-results h4 {
-    margin: 10px 0;
+    margin: 10px 0 10px 10px;
 }
 
 #search-results a {
+    width: 100%;
     padding: 10px;
+    display: inline-block;
+}
 
-    display: block;
+#search-results .card-search-item {
+    position: relative;
+    margin-bottom: 5px;
+}
+
+#search-results .card-link {
+    width: 150px;
+    margin-left: 5px;
+    border: 1px solid grey;
+    border-radius: 5px;
+}
+
+#search-results .card-link:hover {
+    background: grey;
+}
+
+#search-results .card-link-info,
+#search-results .card-link-info strong{
+    vertical-align: bottom;
+    font-size: 14px;
+}
+
+#search-results .card-link-info {
+    position: absolute;
+    top: 3px;
+    left: 160px;
 }
 
 .board-link-container {
     width: 250px;
     height: 40px;
-    border: 1px solid black;
+    border: 1px solid grey;
+    border-radius: 5px;
     margin: 5px;
 }
 
