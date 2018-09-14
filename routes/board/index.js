@@ -102,7 +102,7 @@ function getPersonalTeamBoards(recentboards, req, res, next)
 function renderPage(req, res, recentBoards, data)
 {
     let initials = req.session.user.firstName[0].toUpperCase() + req.session.user.lastName[0].toUpperCase();
-    if (0 === data.length) {
+    if (!data[0].teamId && !data[0].boards) {
         res.render('boards', {
             personalboards: [],
             teams: [],
