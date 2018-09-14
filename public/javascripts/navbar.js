@@ -287,11 +287,18 @@ function handleCustomNavBlur(e)
     let $clicked = $(e.target);
     let $active  = $(document.activeElement);
 
-    console.log($(clicked), $active);
+    // search bar
     let $target = $('#search-input');
     if ($target[0] && $target.is($active)) {
         if ($clicked.closest('#search-nav')[0]) return;
         hideSearchBar();
+    }
+
+    // boards sidebar
+    $target = $('.boards-sidebar');
+    if ($target.hasClass('active')) {
+        if ($clicked.closest('#sideboards-content')[0]) return;
+        displayBoards();
     }
 }
 
