@@ -274,6 +274,36 @@ function handleCustomBlur(e)
 
         hideMemberForm();
     }
+
+    $target = $('#team-title-input');
+    if($target[0] && $target.is($active)) {
+        if ($(clicked).attr('id') === 'team-description-input') return;
+
+        if ($(clicked).closest('.team-creation-container')[0])
+        {
+            setTimeout(() => {
+                $target.focus();
+            }, 0)
+            return;
+        }
+
+        hideTeamForm();
+    }
+
+    $target = $('#team-description-input');
+    if($target[0] && $target.is($active)) {
+        if ($(clicked).attr('id') === 'team-title-input') return;
+
+        if ($(clicked).closest('.team-creation-container')[0])
+        {
+            setTimeout(() => {
+                $target.focus();
+            }, 0)
+            return;
+        }
+
+        hideTeamForm();
+    }
 }
 
 //******************//
