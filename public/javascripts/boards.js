@@ -261,7 +261,7 @@ function handleCustomBlur(e)
     clicked = e.target;
     let $active = $(document.activeElement);
 
-    // check when adding a new member
+    // new member
     let $target = $('#member-name-input');
     if($target[0] && $target.is($active)) {
         if ($(clicked).closest('#member-form')[0])
@@ -275,6 +275,7 @@ function handleCustomBlur(e)
         hideMemberForm();
     }
 
+    // new team
     $target = $('#team-title-input');
     if($target[0] && $target.is($active)) {
         if ($(clicked).attr('id') === 'team-description-input') return;
