@@ -154,6 +154,11 @@ router.get('/list/:id/:bid', function(req,res, next)
 //********************//
 //*   CREATE LIST    *//
 //********************//
+function isNumeric(value)
+{
+    return /^\d+$/.test(value);
+} 
+
 router.post('/list', function(req,res, next) 
 {
     let name    = req.body.name;
@@ -178,15 +183,15 @@ router.post('/list', function(req,res, next)
         next(createError(401, "order value is missing"));
         return;
     }
-    if (typeof ownerId === 'string') {
+    if (typeof ownerId === 'string' && !isNumeric(ownerId)) {
         next(createError(401, "user ID must never be a string"));
         return;
     }
-    if (typeof boardId === 'string') {
+    if (typeof boardId === 'string' && !isNumeric(ownerId)) {
         next(createError(401, "board ID must never be a string"));
         return;
     }
-    if (typeof order === 'string') {
+    if (typeof order === 'string' && !isNumeric(ownerId)) {
         next(createError(401, "order must never be a string"));
         return;
     }
