@@ -31,11 +31,10 @@ function setupCardsSortables()
 
     cardSortable.on('sortable:start', (event) => 
     {
-        console.log(event);
         let $target = $(event.data.dragEvent.data.source);
-        console.log($target);
         if ($target.hasClass('textarea-active')) {
             event.cancel();
+            return;
         }
 
         hideCardForm();
