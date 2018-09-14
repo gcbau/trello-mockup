@@ -124,13 +124,12 @@ function showTeamForm(e)
     console.log($form);
     
     $form.css('left', offset.left+'px');
-
-    console.log($('body').height(), offset.top+300);
-    if (screen.height < offset.top+300) {
-        $form.css('top', (offset.top-264)+'px');
-    } else {
-        $form.css('top', offset.top+'px');
-    }
+    $form.css('top', (offset.top-264)+'px');
+    // if (screen.height < offset.top+300) {
+    //     $form.css('top', (offset.top-264)+'px');
+    // } else {
+    //     $form.css('top', offset.top+'px');
+    // }
 
     $form.addClass('active');
     $('#team-title-input').focus();
