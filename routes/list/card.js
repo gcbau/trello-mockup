@@ -29,6 +29,10 @@ router.get('/card/:uid/:bid', function(req,res, next)
     })
     .then( (data) => {
         res.status(200).json(data);
+    })
+    .catch( (err) => {
+        let error = err;
+        next(createError(400, error));
     });
 
 })
@@ -126,8 +130,8 @@ router.patch('/list/:lid/card', function(req,res, next)
         res.status(200).json(hello);
     })
     .catch( err => {
-        console.catch(err);
-        next(err);
+        let error = err;
+        next(createError(400, error));
     });
 });
 
