@@ -276,6 +276,7 @@ function displayList(data)
     cards[data.id] = [];
 
     listSortable.addContainer(document.querySelectorAll('.list'));
+    setupCardsSortables();
     $('#list-form-container')[0].scrollIntoView();
     $('#listTitleInput').trigger('focus');
 }
