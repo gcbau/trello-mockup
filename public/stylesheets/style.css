@@ -124,7 +124,7 @@ h2 {
 .card-container {
     position: relative;
     min-height: 50px;
-    min-width: 300px;
+    min-width: 256px;
     width: auto;
     overflow-y: scroll;
 }
