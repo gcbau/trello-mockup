@@ -161,7 +161,6 @@ function createNewTeam(e)
         }
     })
     .done( data => {
-        console.log(data);
         displayNewTeam(data.id, data.name, $('#create-new-team-btn'));
     })
     .fail( err => {
@@ -172,8 +171,6 @@ function createNewTeam(e)
 function displayNewTeam(teamId, title, $target)
 {
     let stringHTML = generateTeamRow(teamId, title);
-    // console.log($target);
-    // $(stringHTML).insertBefore($target);
     $('#personal').after(stringHTML);
     hideTeamForm();
 }
@@ -202,12 +199,10 @@ function searchMembers(e)
     e.preventDefault();
     let userInput = $('#member-name-input').val().trim();
 
-    console.log(userInput);
     $.ajax({
         url: `/user?name=${userInput}`,
         method: 'get',
         success: data => {
-            console.log(data);
             displayMemberOptions(data);
         },
         error: err => {
