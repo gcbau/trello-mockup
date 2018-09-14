@@ -372,6 +372,9 @@
     width: 100%;
     padding: 10px;
     display: inline-block;
+
+    text-decoration: none;
+    color: inherit;
 }
 
 #search-results .card-search-item {
