@@ -28,9 +28,21 @@ function setupCardsSortables()
         draggable: '.card'
     });
 
-    cardSortable.on('sortable:stop', (event) => 
+
+    cardSortable.on('sortable:start', (event) => 
     {
         console.log(event);
+        let $target = $(event.data.dragEvent.data.source);
+        console.log($target);
+        if ($target.hasClass('textarea-active')) {
+            event.cancel();
+        }
+
+        hideCardForm();
+    })
+
+    cardSortable.on('sortable:stop', (event) => 
+    {
         let $card = $(event.data.dragEvent.data.source);
         let oldContainer = event.data.oldContainer;
         let newContainer = event.data.newContainer;
