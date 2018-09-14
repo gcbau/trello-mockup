@@ -253,6 +253,32 @@ function sendInvitation(e)
 }
 
 //******************//
+//  BLUR HANDLING
+//******************//
+
+function handleCustomBlur(e)
+{
+    clicked = e.target;
+    let $active = $(document.activeElement);
+    let $target = $('#member-name-input');
+
+    if($target[0] && $target.is($active)) {
+        if ($(clicked).attr('id') === 'member-name-input') {
+            return;
+        }
+
+        if ($(clicked).attr('id') === 'member-options' || $(clicked).hasClass('member-option')) {
+            setTimeout(() => {
+                $target.focus();
+            }, 10)
+            return;
+        }
+
+        hideMemberForm();
+    }
+}
+
+//******************//
 //  MAIN FUNCTION 
 //******************//
 
@@ -270,26 +296,7 @@ $(function() {
     $content = $('#board-content');
 
     // event handlers
-    $(document).on('mousedown', (e) => {
-        clicked = e.target;
-        let $active = $(document.activeElement);
-        let $target = $('#member-name-input');
-
-        if($target[0] && $target.is($active)) {
-            if ($(clicked).attr('id') === 'member-name-input') {
-                return;
-            }
-
-            if ($(clicked).attr('id') === 'member-options' || $(clicked).hasClass('member-option')) {
-                setTimeout(() => {
-                    $target.focus();
-                }, 10)
-                return;
-            }
-
-            hideMemberForm();
-        }
-    })
+    $(document).on('mousedown', handleCustomBlur);
 
     $body.on('click', '.create-new-board-btn', showBoardModal);
     $body.on('click', '.modal-background', hideBoardModal);
