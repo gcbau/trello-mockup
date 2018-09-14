@@ -298,7 +298,16 @@ function handleCustomNavBlur(e)
     $target = $('.boards-sidebar');
     if ($target.hasClass('active')) {
         if ($clicked.closest('#sideboards-content')[0]) return;
+        if ($clicked.closest('#boards-nav')[0]) return;
         displayBoards();
+    }
+
+    // notifications
+    $target = $('.notifications-sidebar');
+    if ($target.hasClass('active')) {
+        if ($clicked.closest('.notifications-sidebar')[0]) return;
+        if ($clicked.closest('#notifications-nav')[0]) return;
+        displayNotifications();
     }
 }
 
@@ -316,7 +325,7 @@ $(function() {
 
     // sidebar display
     $showBoards.on('click', displayBoards);
-    $showProfile.on('click', displayProfile);
+    // $showProfile.on('click', displayProfile);
     $showNots.on('click', displayNotifications);
 
     // 

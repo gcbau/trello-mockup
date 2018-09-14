@@ -62,6 +62,8 @@
     border-radius: 100%;
     background: #d6dadc;
     color: #444444;
+
+    cursor: default;
 }
 
 #boards-nav {
