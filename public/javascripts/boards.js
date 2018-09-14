@@ -260,17 +260,15 @@ function handleCustomBlur(e)
 {
     clicked = e.target;
     let $active = $(document.activeElement);
+
+    // check when adding a new member
     let $target = $('#member-name-input');
-
     if($target[0] && $target.is($active)) {
-        if ($(clicked).attr('id') === 'member-name-input') {
-            return;
-        }
-
-        if ($(clicked).attr('id') === 'member-options' || $(clicked).hasClass('member-option')) {
+        if ($(clicked).closest('#member-form')[0])
+        {
             setTimeout(() => {
                 $target.focus();
-            }, 10)
+            }, 0)
             return;
         }
 
