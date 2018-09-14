@@ -167,7 +167,8 @@ router.post('/board', function(req, res, next)
     `;
 
     if (req.body.teamId) {
-        if (typeof req.body.teamId === 'string') {
+        let isNum = /^\d+$/.test(req.body.teamId);
+        if (typeof req.body.teamId === 'string' && !isNum) {
             next(createError(400, 'teamId should never be a string'));
         }
 
