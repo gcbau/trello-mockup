@@ -37,6 +37,12 @@ router.get('/card/:uid/:bid', function(req,res, next)
 
 })
 
+
+function isNumeric(value)
+{
+    return /^\d+$/.test(value);
+} 
+
 router.post('/card', function(req,res, next) 
 {
     let name        = req.body.name;
@@ -62,15 +68,15 @@ router.post('/card', function(req,res, next)
         next(createError(401, "order value is missing"));
         return;
     }
-    if (typeof ownerId === 'string') {
+    if (typeof ownerId === 'string' && !isNumeric(ownerId)) {
         next(createError(401, "list ID must never be a string"));
         return;
     }
-    if (typeof listId === 'string') {
+    if (typeof listId === 'string' && !isNumeric(listId)) {
         next(createError(401, "list ID must never be a string"));
         return;
     }
-    if (typeof order === 'string') {
+    if (typeof order === 'string' && !isNumeric(order)) {
         next(createError(401, "order must never be a string"));
         return;
     }
