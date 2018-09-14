@@ -102,7 +102,7 @@ function getPersonalTeamBoards(recentboards, req, res, next)
 function renderPage(req, res, recentBoards, data)
 {
     let initials = req.session.user.firstName[0].toUpperCase() + req.session.user.lastName[0].toUpperCase();
-    if (!data[0].teamId && !data[0].boards) {
+    if (!data[0].teamId && !data[0].boards && 0 >= data.length) {
         res.render('boards', {
             personalboards: [],
             teams: [],
@@ -111,7 +111,6 @@ function renderPage(req, res, recentBoards, data)
             initials: initials
         });
     } else {
-        console.log(data);
         let personal = data[0];
         let teams = data.slice(1, data.length);
         // let personal = data[0];
@@ -127,6 +126,8 @@ function renderPage(req, res, recentBoards, data)
             });
             return;
         } 
+
+        if (!personal.boards) personal.boards = [];
 
         res.render('boards', {
             personalboards: personal.boards,
