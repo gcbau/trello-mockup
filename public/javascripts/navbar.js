@@ -179,8 +179,8 @@ function displaySearchBar(e) {
     $('#search-input').focus();
 }
 
-function hideSearchBar(e) {
-    let $target = $(e.target).closest('#search-nav');
+function hideSearchBar() {
+    let $target = $('#search-nav');
     $target
         .removeClass('search-extended')
         .empty()
@@ -279,6 +279,23 @@ function displayResults(data)
 }
 
 //******************//
+//  BLUR HANDLING
+//******************//
+
+function handleCustomNavBlur(e)
+{
+    let $clicked = $(e.target);
+    let $active  = $(document.activeElement);
+
+    console.log($(clicked), $active);
+    let $target = $('#search-input');
+    if ($target[0] && $target.is($active)) {
+        if ($clicked.closest('#search-nav')[0]) return;
+        hideSearchBar();
+    }
+}
+
+//******************//
 //      MAIN
 //******************//
 
@@ -286,14 +303,17 @@ $(function() {
     var $showBoards  = $('#boards-nav');
     var $showProfile = $('#profile-nav');
     var $showNots    = $('#notifications-nav');
-
-    $showBoards.click(displayBoards);
-    $showProfile.click(displayProfile);
-    $showNots.click(displayNotifications);
-
     var $search  = $('#search-nav');
 
-    $search.click(displaySearchBar);
+    $(document).on('mousedown', handleCustomNavBlur);
+
+    // sidebar display
+    $showBoards.on('click', displayBoards);
+    $showProfile.on('click', displayProfile);
+    $showNots.on('click', displayNotifications);
+
+    // 
+    $search.on('click', displaySearchBar);
     $search.on('click', '.close-search-btn', hideSearchBar);
     $search.on('keyup', '#search-input', checkToSearch);
 
