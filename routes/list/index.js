@@ -187,11 +187,11 @@ router.post('/list', function(req,res, next)
         next(createError(401, "user ID must never be a string"));
         return;
     }
-    if (typeof boardId === 'string' && !isNumeric(ownerId)) {
+    if (typeof boardId === 'string' && !isNumeric(boardId)) {
         next(createError(401, "board ID must never be a string"));
         return;
     }
-    if (typeof order === 'string' && !isNumeric(ownerId)) {
+    if (typeof order === 'string' && !isNumeric(order)) {
         next(createError(401, "order must never be a string"));
         return;
     }
